@@ -1,0 +1,5 @@
+.etieti {
+    display: flex;
+    /* justify-content: space-between; アイテム間のスペースを均等に */
+    /*align-items: center;*/ /* アイテムを中央に揃える */
+}
