@@ -8,128 +8,28 @@
     <script src="js/breed_pokemon.js"></script>
 </head>
 <body>
-    <script>
-        function initSelect(selectId) {
-            let selectEle = document.getElementById(selectId);
-            let options = selectEle.getElementsByTagName("option");
-            Array.from(options).map(option => {option.value = option.innerText})
-        }
-    </script>
-
     <label for="pokemon-select">ポケモン:</label>
-    <select id="pokemon-select">
-    </select>
-
+    <select id="pokemon-select"></select>
     <br>
 
     <label for="nature-select">性格</label>
-    <select id="nature-select">
-        <option>さみしがり</option>
-        <option>いじっぱり</option>
-        <option>やんちゃ</option>
-        <option>ゆうかん</option>
-        <option>ずぶとい</option>
-        <option>わんぱく</option>
-        <option>のうてんき</option>
-        <option>のんき</option>
-        <option>ひかえめ</option>
-        <option>おっとり</option>
-        <option>うっかりや</option>
-        <option>れいせい</option>
-        <option>おだやか</option>
-        <option>おとなしい</option>
-        <option>しんちょう</option>
-        <option>なまいき</option>
-        <option>おくびょう</option>
-        <option>せっかち</option>
-        <option>ようき</option>
-        <option>むじゃき</option>
-        <option>てれや</option>
-        <option>がんばりや</option>
-        <option>すなお</option>
-        <option>きまぐれ</option>
-        <option>まじめ</option>
-    </select>
-
+    <select id="nature-select"></select>
     <br>
 
-    <br>
-    <script>
-        const MAX_MOVESET_NUM = 4;
-        const MOVE_NAMES = [
-            "ストーンエッジ",
-            "ひのこ",
-            "たいあたり",
-            "つるのムチ",
-            "なみのり",
-            "みずでっぽう",
-            "れいとうビーム",
-        ];
-        for (let i=0; i < MAX_MOVESET_NUM; i++) {
-            let moveDiv = document.createElement("div");
-            moveDiv.id = "move" + i;
-            document.body.appendChild(moveDiv);
+    <div id="move-container"></div>
 
-            let moveSelectId = "move" + i + "-select";
+    <input type="number" id="hp-iv" min="-1" max="31" step="1" value="31">
+    <input type="number" id="atk-iv" min="-1" max="31" step="1" value="31">
+    <input type="number" id="def-iv" min="-1" max="31" step="1" value="31">
+    <input type="number" id="sp-atk-iv" min="-1" max="31" step="1" value="31">
+    <input type="number" id="sp-def-iv" min="-1" max="31" step="1" value="31">
+    <input type="number" id="speed-iv" min="-1" max="31" step="1" value="31">
 
-            let moveLebel = document.createElement("label");
-            moveLebel.for = moveSelectId
-            moveLebel.innerText = "技" + i;
-
-            let moveSelect = document.createElement("select");
-            moveSelect.id = moveSelectId
-
-            MOVE_NAMES.map((moveName) => {
-                let option = document.createElement("option");
-                option.innerText = moveName;
-                option.value = moveName;
-                moveSelect.appendChild(option);
-            });
-
-            pointUpInputId = "point-up" + i + "-input";
-            let pointUpLabel = document.createElement("label");
-            pointUpLabel.for = pointUpInputId;
-            pointUpLabel.innerText = "技" + i + "のポイントアップ";
-
-            let pointUpInput = document.createElement('input');
-            pointUpInput.type = "number";
-            pointUpInput.id = pointUpInputId;
-            pointUpInput.min = "-1";
-            pointUpInput.max = "3";
-            pointUpInput.step = "1";
-            pointUpInput.value = "3";
-
-            moveDiv.appendChild(moveLebel)
-            moveDiv.appendChild(moveSelect)
-            moveDiv.appendChild(pointUpLabel)
-            moveDiv.appendChild(pointUpInput)
-        }
-    </script>
-    <script>
-        initSelect("pokemon-select");
-        initSelect("nature-select");
-
-        const baseURL = "http://localhost:8080/dawn/";
-
-        function makeFullURL(dataType) {
-            return baseURL + `?data_type=${encodeURIComponent(dataType)}`;
-        }
-
-        fetch(makeFullURL("all_poke_names"))
-            .then((response) => {
-                return response.json();
-            })
-            .then((json) => {
-                const ALL_POKE_NAMES = Array.from(JSON.parse(JSON.stringify(json)));
-                console.log(ALL_POKE_NAMES)
-                pokemonSelect = document.getElementById("pokemon-select");
-                ALL_POKE_NAMES.map((pokeName, i) => {
-                    let option = document.createElement("option");
-                    option.innerText = pokeName;
-                    option.value = pokeName;
-                    pokemonSelect.appendChild(option)
-                });
-            })
-    </script>
+    <input type="number" id="hp-ev" min="-1" max="252" step="1" value="0">
+    <input type="number" id="atk-ev" min="-1" max="252" step="1" value="0">
+    <input type="number" id="def-ev" min="-1" max="252" step="1" value="0">
+    <input type="number" id="sp-atk-ev" min="-1" max="252" step="1" value="0">
+    <input type="number" id="sp-def-ev" min="-1" max="252" step="1" value="0">
+    <input type="number" id="speed-ev" min="-1" max="252" step="1" value="0">
 </body>
 </html>
