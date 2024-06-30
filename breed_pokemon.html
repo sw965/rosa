@@ -13,6 +13,10 @@
     <select id="pokemon-select"></select>
     <br>
 
+    <label for="nature-select">性格</label>
+    <select id="nature-select"></select>
+    <br>
+    
     <div id="move1-div">
         <label for="move1-select">技1</label>
         <select id="move1-select"></select>
@@ -40,10 +44,6 @@
         <label for="move4-point-up-input">ポイントアップ</label>
         <input type="number" id="move4-point-up-input">
     </div>
-
-    <label for="nature-select">性格</label>
-    <select id="nature-select"></select>
-    <br>
 
     <label for="hp-iv-input">HP個体値</label>
     <input id="hp-iv-input" type="number">
@@ -110,7 +110,10 @@
         <button id="min-speed-ev-button">最小</button>
         <button id="max-speed-ev-button">最大</button>
     </div>
+    <h3 id="sum-ev-h3">合計努力値 : 0</h3>
 
-    <button id="test-button">テスト</button>
+    <img id="pokemon-img">
+    <br>
+    <button id="file-save-button">ファイル保存</button>
 </body>
 </html>
