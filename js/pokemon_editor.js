@@ -1,64 +1,3 @@
-class Pokemon {
-    constructor() {
-        this.pokeName = null;
-        this.nature = null;
-
-        this.moveNames = null;
-        this.pointUps = null;
-
-        this.ivStat = {
-            hp:null,
-            atk:null,
-            def:null,
-            spAtk:null,
-            spDef:null,
-            speed:null,
-        };
-
-        this.evStat = {
-            hp:null,
-            atk:null,
-            def:null,
-            spAtk:null,
-            spDef:null,
-            speed:null,
-        };
-    }
-
-    getIVArray() {
-        return [
-            this.ivStat.hp,
-            this.ivStat.atk,
-            this.ivStat.def,
-            this.ivStat.spAtk,
-            this.ivStat.spDef,
-            this.ivStat.speed,
-        ];
-    }
-
-    getEVArray() {
-        return [
-            this.evStat.hp,
-            this.evStat.atk,
-            this.evStat.def,
-            this.evStat.spAtk,
-            this.evStat.spDef,
-            this.evStat.speed,
-        ];
-    }
-}
-
-function objectToPokemon(obj) {
-    const pokemon = new Pokemon();
-    pokemon.name = obj.name;
-    pokemon.nature = obj.nature;
-    pokemon.moveNames = obj.moveNames;
-    pokemon.pointUps = obj.pointUps;
-    pokemon.ivStat = obj.ivStat;
-    pokemon.evStat = obj.evStat;
-    return pokemon;
-}
-
 const INDEX = new URLSearchParams(window.location.search).get("index");
 
 var INIT_POKEMON = function() {
@@ -69,12 +8,6 @@ var INIT_POKEMON = function() {
         return objectToPokemon(JSON.parse(item));
     }
 }();
-
-const EMPTY = "なし";
-
-var POKEDEX;
-
-const MAX_MOVESET_NUM = 4;
 
 const MOVE_SELECT_IDS = [
     "move1-select",
@@ -129,8 +62,6 @@ function updateMoveSelects(moveSelects) {
     });
 }
 
-const MIN_POINT_UP = 0;
-const MAX_POINT_UP = 3;
 const POINT_UP_INPUT_IDS = [
     "move1-point-up-input",
     "move2-point-up-input",
@@ -138,8 +69,6 @@ const POINT_UP_INPUT_IDS = [
     "move4-point-up-input",
 ];
 
-const MIN_IV = 0;
-const MAX_IV = 31;
 const IV_INPUT_IDS = [
     "hp-iv-input", "atk-iv-input", "def-iv-input",
     "sp-atk-iv-input", "sp-def-iv-input", "speed-iv-input",
@@ -162,11 +91,6 @@ const MIN_IV_BUTTON_IDS = [
     "min-sp-def-iv-button",
     "min-speed-iv-button",
 ]
-
-const MIN_EV = 0;
-const MAX_EV = 252;
-const MAX_SUM_EV = 510;
-const EFFECT_EV = 4;
 
 const EV_INPUT_IDS = [
     "hp-ev-input",
@@ -214,19 +138,13 @@ function updateSumEVInnerText(evInputs, sumEVHeading) {
 }
 
 const POKEMON_IMG_ID = "pokemon-img";
-const BREED_BUTTON_ID = "file-save-button";
+const FILE_SAVE_BUTTON_ID = "file-save-button";
 
 function getPokemonImgPath(pokeName) {
     return "img/" + pokeName + ".gif";
 }
 
-const BASE_URL = "http://localhost:8080/dawn/";
-
-function makeFullURL(dataType) {
-    return BASE_URL + `?data_type=${encodeURIComponent(dataType)}`;
-}
-
-document.addEventListener("DOMContentLoaded", (event) => {
+document.addEventListener("DOMContentLoaded", () => {
     const POKEMON_SELECT = document.getElementById("pokemon-select");
 
     POKEMON_SELECT.addEventListener("change", () => {
@@ -235,51 +153,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         POKEMON_IMG.src = getPokemonImgPath(pokeName);
     });
 
-    let ALL_POKE_NAMES
-    const allPokeNamesLoader =
-        fetch(makeFullURL("all_poke_names"))
-            .then(response => {
-                return response.json();
-            })
-            .then(json => {
-                return new Promise(resolve => {
-                    ALL_POKE_NAMES = Array.from(JSON.parse(JSON.stringify(json)));
-                    resolve();
-                })
-            })
-            .catch(err => {
-                console.error(err);
-            });
-
-    const pokedexLoader =
-        fetch(makeFullURL("pokedex"))
-            .then(response => {
-                return response.json();
-            })
-            .then(json => {
-                return new Promise(resolve => {
-                    POKEDEX = JSON.parse(JSON.stringify(json));
-                    resolve();
-                })
-            })
-            .catch(err => {
-                console.error(err);
-            });
-
     const NATURE_SELECT = document.getElementById("nature-select");
-
-    let ALL_NATURES
-    const allNaturesLoader =
-        fetch(makeFullURL("all_natures"))
-            .then(response => {
-                return response.json();
-            })
-            .then(json => {
-                return new Promise(resolve => {
-                    ALL_NATURES = Array.from(JSON.parse(JSON.stringify(json)));
-                    resolve();
-                })
-            });
     
     const MOVE_SELECTS = MOVE_SELECT_IDS.map(moveSelectId => {
         return document.getElementById(moveSelectId);
@@ -287,17 +161,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
     const POKEMON_IMG = document.getElementById(POKEMON_IMG_ID);
 
-    Promise.all([pokedexLoader, allPokeNamesLoader, allNaturesLoader])
+    baseDataLoader
         .then(() => {
             ALL_POKE_NAMES.map(pokeName => {
                 option = document.createElement("option");
                 option.innerText = pokeName;
                 option.value = pokeName;
                 POKEMON_SELECT.appendChild(option);
-                console.log("通過", pokeName);
             });
-
-            POKEMON_IMG.src = getPokemonImgPath(ALL_POKE_NAMES[0]);
 
             switchLearnset(ALL_POKE_NAMES[0], MOVE_SELECTS);
 
@@ -309,9 +180,14 @@ document.addEventListener("DOMContentLoaded", (event) => {
             });
         })
         .then(() => {
-            if (INIT_POKEMON.pokeName !== null) {
+            console.log(INIT_POKEMON);
+            if (INIT_POKEMON.name !== null) {
+                console.log("侵入");
                 POKEMON_SELECT.value = INIT_POKEMON.name;
                 switchLearnset(POKEMON_SELECT.value, MOVE_SELECTS);
+                POKEMON_IMG.src = getPokemonImgPath(POKEMON_SELECT.value);
+            } else {
+                POKEMON_IMG.src = getPokemonImgPath(ALL_POKE_NAMES[0]);
             }
 
             if (INIT_POKEMON.nature !== null) {
@@ -319,9 +195,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             }
 
             if (INIT_POKEMON.moveNames !== null) {
-                console.log("MOVE_SELECTS", MOVE_SELECTS);
                 MOVE_SELECTS.map((moveSelect, i) => {
-                    console.log("ms.v", moveSelect.value);
                     moveSelect.value = INIT_POKEMON.moveNames[i];
                 });
             }
@@ -359,9 +233,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
     IV_INPUTS.map((ivInput, i) => {
         ivInput.min = MIN_IV;
         ivInput.max = MAX_IV;
-        const ivArray = INIT_POKEMON.getIVArray();
-        if (ivArray[i] !== null) {
-            ivInput.value = ivArray[i];
+        const initIV = INIT_POKEMON.getIVArray()[i];
+        if (initIV !== null) {
+            ivInput.value = initIV;
         } else {
             ivInput.value = MAX_IV;
         }
@@ -402,7 +276,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
     EV_INPUTS.map((evInput, i) => {
         evInput.min = MIN_EV;
         evInput.max = MAX_EV;
-        evInput.value = MIN_EV;
+
+        const initEV = INIT_POKEMON.getEVArray()[i];
+        if (initEV !== null) {
+            evInput.value = initEV;
+        } else {
+            evInput.value = MIN_EV;
+        }
         evInput.step = EFFECT_EV;
         
         evInput.addEventListener("keydown", event => {
@@ -476,19 +356,19 @@ document.addEventListener("DOMContentLoaded", (event) => {
             speed:parseInt(EV_INPUTS[5].value, 10),
         };
 
-        return {
-            name: POKEMON_SELECT.value,
-            nature: NATURE_SELECT.value,
-            moveNames:moveNames,
-            pointUps:pointUps,
-            moveset:moveset,
-            ivStat:ivStat,
-            evStat:evStat,
-        };
+        const pokemon = new Pokemon();
+        pokemon.name = POKEMON_SELECT.value;
+        pokemon.nature = NATURE_SELECT.value;
+        pokemon.moveNames = moveNames;
+        pokemon.pointUps = pointUps;
+        pokemon.moveset = moveset;
+        pokemon.ivStat = ivStat;
+        pokemon.evStat = evStat;
+        return pokemon;
     }
 
-    const BREED_BUTTON = document.getElementById(BREED_BUTTON_ID);
-    BREED_BUTTON.addEventListener("click", () => {
+    const FILE_SAVE_BUTTON = document.getElementById(FILE_SAVE_BUTTON_ID);
+    FILE_SAVE_BUTTON.addEventListener("click", () => {
         const pokemon = makePokemon();
         let jsonString = JSON.stringify(pokemon, null, 2);
         let blob = new Blob([jsonString], { type: "application/json" });
@@ -507,7 +387,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.onload = function(e) {
-            const pokemon = JSON.parse(e.target.result);
+            const pokemon = objectToPokemon(JSON.parse(e.target.result));
 
             POKEMON_SELECT.value = pokemon.name;
             switchLearnset(pokemon.name, MOVE_SELECTS);
@@ -522,19 +402,15 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 POINT_UP_INPUTS[i].value = pointUp;
             });
 
-            IV_INPUTS[0].value = pokemon.ivStat.hp;
-            IV_INPUTS[1].value = pokemon.ivStat.atk;
-            IV_INPUTS[2].value = pokemon.ivStat.def;
-            IV_INPUTS[3].value = pokemon.ivStat.spAtk;
-            IV_INPUTS[4].value = pokemon.ivStat.spDef;
-            IV_INPUTS[5].value = pokemon.ivStat.speed;
+            const ivArray = pokemon.getIVArray();
+            IV_INPUTS.map((ivInput, i) => {
+                ivInput.value = ivArray[i];
+            });
 
-            EV_INPUTS[0].value = pokemon.evStat.hp;
-            EV_INPUTS[1].value = pokemon.evStat.atk;
-            EV_INPUTS[2].value = pokemon.evStat.def;
-            EV_INPUTS[3].value = pokemon.evStat.spAtk;
-            EV_INPUTS[4].value = pokemon.evStat.spDef;
-            EV_INPUTS[5].value = pokemon.evStat.speed;
+            const evArray = pokemon.getEVArray();
+            EV_INPUTS.map((evInput, i) => {
+                evInput.value = evArray[i];                
+            })
 
             SUM_EV_HEADING.innerText = getSumEVText(getSumEV(EV_INPUTS));
             POKEMON_IMG.src = getPokemonImgPath(pokemon.name);
