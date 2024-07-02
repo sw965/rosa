@@ -1,39 +1,72 @@
+class Pokemon {
+    constructor() {
+        this.pokeName = null;
+        this.nature = null;
+
+        this.moveNames = null;
+        this.pointUps = null;
+
+        this.ivStat = {
+            hp:null,
+            atk:null,
+            def:null,
+            spAtk:null,
+            spDef:null,
+            speed:null,
+        };
+
+        this.evStat = {
+            hp:null,
+            atk:null,
+            def:null,
+            spAtk:null,
+            spDef:null,
+            speed:null,
+        };
+    }
+
+    getIVArray() {
+        return [
+            this.ivStat.hp,
+            this.ivStat.atk,
+            this.ivStat.def,
+            this.ivStat.spAtk,
+            this.ivStat.spDef,
+            this.ivStat.speed,
+        ];
+    }
+
+    getEVArray() {
+        return [
+            this.evStat.hp,
+            this.evStat.atk,
+            this.evStat.def,
+            this.evStat.spAtk,
+            this.evStat.spDef,
+            this.evStat.speed,
+        ];
+    }
+}
+
+function objectToPokemon(obj) {
+    const pokemon = new Pokemon();
+    pokemon.name = obj.name;
+    pokemon.nature = obj.nature;
+    pokemon.moveNames = obj.moveNames;
+    pokemon.pointUps = obj.pointUps;
+    pokemon.ivStat = obj.ivStat;
+    pokemon.evStat = obj.evStat;
+    return pokemon;
+}
+
 const INDEX = new URLSearchParams(window.location.search).get("index");
-var STORAGE = function() {
+
+var INIT_POKEMON = function() {
     const item = sessionStorage.getItem(INDEX);
-    if (item == null) {
-        return {
-            pokeName:null,
-            nature:null,
-
-            move1Name:null,
-            move1PointUp:null,
-
-            move2Name:null,
-            move2PointUp:null,
-
-            move3Name:null,
-            move3PointUp:null,
-
-            move4Name:null,
-            move4PointUp:null,
-
-            hpIV:null,
-            atkIV:null,
-            defIV:null,
-            spAtkIV:null,
-            spDefIV:null,
-            speedIV:null,
-
-            hpEV:null,
-            atkEV:null,
-            defEV:null,
-            spAtkEV:null,
-            spDefEV:null,
-            speedEV:null,
-        }
+    if (item === null) {
+        return new Pokemon();
     } else {
-        return JSON.parse(JSON.stringify(item));
+        return objectToPokemon(JSON.parse(item));
     }
 }();
 
@@ -112,6 +145,24 @@ const IV_INPUT_IDS = [
     "sp-atk-iv-input", "sp-def-iv-input", "speed-iv-input",
 ];
 
+const MAX_IV_BUTTON_IDS = [
+    "max-hp-iv-button",
+    "max-atk-iv-button",
+    "max-def-iv-button",
+    "max-sp-atk-iv-button",
+    "max-sp-def-iv-button",
+    "max-speed-iv-button",
+]
+
+const MIN_IV_BUTTON_IDS = [
+    "min-hp-iv-button",
+    "min-atk-iv-button",
+    "min-def-iv-button",
+    "min-sp-atk-iv-button",
+    "min-sp-def-iv-button",
+    "min-speed-iv-button",
+]
+
 const MIN_EV = 0;
 const MAX_EV = 252;
 const MAX_SUM_EV = 510;
@@ -126,15 +177,6 @@ const EV_INPUT_IDS = [
     "speed-ev-input",
 ]
 
-const MIN_EV_BUTTON_IDS = [
-    "min-hp-ev-button",
-    "min-atk-ev-button",
-    "min-def-ev-button",
-    "min-sp-atk-ev-button",
-    "min-sp-def-ev-button",
-    "min-speed-ev-button",
-]
-
 const MAX_EV_BUTTON_IDS = [
     "max-hp-ev-button",
     "max-atk-ev-button",
@@ -144,7 +186,16 @@ const MAX_EV_BUTTON_IDS = [
     "max-speed-ev-button",
 ]
 
-const SUM_EV_H_ID = "sum-ev-h3";
+const MIN_EV_BUTTON_IDS = [
+    "min-hp-ev-button",
+    "min-atk-ev-button",
+    "min-def-ev-button",
+    "min-sp-atk-ev-button",
+    "min-sp-def-ev-button",
+    "min-speed-ev-button",
+]
+
+const SUM_EV_HEADING_ID = "sum-ev-h3";
 
 function getSumEVText(sumEV) {
     return "合計努力値 : " + String(sumEV);
@@ -158,8 +209,8 @@ function getSumEV(evInputs) {
     });
 }
 
-function updateSumEVInnerText(evInputs, sumEVH) {
-    sumEVH.innerText = getSumEVText(getSumEV(evInputs));
+function updateSumEVInnerText(evInputs, sumEVHeading) {
+    sumEVHeading.innerText = getSumEVText(getSumEV(evInputs));
 }
 
 const POKEMON_IMG_ID = "pokemon-img";
@@ -177,10 +228,6 @@ function makeFullURL(dataType) {
 
 document.addEventListener("DOMContentLoaded", (event) => {
     const POKEMON_SELECT = document.getElementById("pokemon-select");
-
-    if (STORAGE.pokeName !== null) {
-        POKEMON_SELECT.value = STORAGE.pokeName;
-    }
 
     POKEMON_SELECT.addEventListener("change", () => {
         const pokeName = POKEMON_SELECT.value
@@ -220,9 +267,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
             });
 
     const NATURE_SELECT = document.getElementById("nature-select");
-    if (STORAGE.pokeName !== null) {
-        NATURE_SELECT.value = STORAGE.pokeName;
-    }
 
     let ALL_NATURES
     const allNaturesLoader =
@@ -241,22 +285,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
         return document.getElementById(moveSelectId);
     });
 
-    if (STORAGE !== null) {
-        MOVE_SELECTS[0].value = STORAGE.move1Name;
-    }
-
-    if (STORAGE !== null) {
-        MOVE_SELECTS[1].value = STORAGE.move2Name;
-    }
-
-    if (STORAGE !== null) {
-        MOVE_SELECTS[2].value = STORAGE.move3Name;
-    }
-
-    if (STORAGE !== null) {
-        MOVE_SELECTS[3].value = STORAGE.move4Name;
-    }
-
     const POKEMON_IMG = document.getElementById(POKEMON_IMG_ID);
 
     Promise.all([pokedexLoader, allPokeNamesLoader, allNaturesLoader])
@@ -266,6 +294,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 option.innerText = pokeName;
                 option.value = pokeName;
                 POKEMON_SELECT.appendChild(option);
+                console.log("通過", pokeName);
             });
 
             POKEMON_IMG.src = getPokemonImgPath(ALL_POKE_NAMES[0]);
@@ -278,11 +307,29 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 option.value = nature;
                 NATURE_SELECT.appendChild(option);                
             });
+        })
+        .then(() => {
+            if (INIT_POKEMON.pokeName !== null) {
+                POKEMON_SELECT.value = INIT_POKEMON.name;
+                switchLearnset(POKEMON_SELECT.value, MOVE_SELECTS);
+            }
+
+            if (INIT_POKEMON.nature !== null) {
+                NATURE_SELECT.value = INIT_POKEMON.nature;
+            }
+
+            if (INIT_POKEMON.moveNames !== null) {
+                console.log("MOVE_SELECTS", MOVE_SELECTS);
+                MOVE_SELECTS.map((moveSelect, i) => {
+                    console.log("ms.v", moveSelect.value);
+                    moveSelect.value = INIT_POKEMON.moveNames[i];
+                });
+            }
         });
 
     MOVE_SELECTS.map(moveSelect => {
         moveSelect.addEventListener("change", () => {
-            updateMoveSelects(moveSelect);
+            updateMoveSelects(MOVE_SELECTS);
         });
     });
 
@@ -301,34 +348,23 @@ document.addEventListener("DOMContentLoaded", (event) => {
         return document.getElementById(ivInputId);
     })
 
-    if (STORAGE.hpIV !== null) {
-        IV_INPUTS[0].value = STORAGE.hpIV
-    }
+    const MAX_IV_BUTTONS = MAX_IV_BUTTON_IDS.map(maxIVButtonID => {
+        return document.getElementById(maxIVButtonID);
+    });
+    
+    const MIN_IV_BUTTONS = MIN_IV_BUTTON_IDS.map(minIVButtonID => {
+        return document.getElementById(minIVButtonID);
+    });
 
-    if (STORAGE.atkIV !== null) {
-        IV_INPUTS[1].value = STORAGE.atkIV
-    }
-
-    if (STORAGE.defIV !== null) {
-        IV_INPUTS[2].value = STORAGE.defIV
-    }
-
-    if (STORAGE.spAtkIV !== null) {
-        IV_INPUTS[3].value = STORAGE.spAtkIV
-    }
-
-    if (STORAGE.spDefIV !== null) {
-        IV_INPUTS[4].value = STORAGE.spDefIV
-    }
-
-    if (STORAGE.speedIV !== null) {
-        IV_INPUTS[5].value = STORAGE.speedIV
-    }
-
-    IV_INPUTS.map(ivInput => {
+    IV_INPUTS.map((ivInput, i) => {
         ivInput.min = MIN_IV;
         ivInput.max = MAX_IV;
-        ivInput.value = MAX_IV;
+        const ivArray = INIT_POKEMON.getIVArray();
+        if (ivArray[i] !== null) {
+            ivInput.value = ivArray[i];
+        } else {
+            ivInput.value = MAX_IV;
+        }
         ivInput.step = 1;
 
         ivInput.addEventListener("keydown", () => {
@@ -339,47 +375,29 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 event.preventDefault();
             }
         });
+
+        MAX_IV_BUTTONS[i].addEventListener("click", () => {
+            ivInput.value = MAX_IV;
+        });
+
+        MIN_IV_BUTTONS[i].addEventListener("click", () => {
+            ivInput.value = MIN_IV;
+        });
     });
 
     const EV_INPUTS = EV_INPUT_IDS.map(evInputID => {
         return document.getElementById(evInputID);
     });
 
-    if (STORAGE.hpEV !== null) {
-        EV_INPUTS[0].value = STORAGE.hpEV
-    }
-
-    if (STORAGE.atkEV !== null) {
-        EV_INPUTS[1].value = STORAGE.atkEV
-    }
-
-    if (STORAGE.defEV !== null) {
-        EV_INPUTS[2].value = STORAGE.defEV
-    }
-
-    if (STORAGE.spAtkEV !== null) {
-        EV_INPUTS[3].value = STORAGE.spAtkEV
-    }
-
-    if (STORAGE.spDefEV !== null) {
-        EV_INPUTS[4].value = STORAGE.spDefEV
-    }
-
-    if (STORAGE.speedEV !== null) {
-        EV_INPUTS[5].value = STORAGE.speedEV
-    }
+    const MAX_EV_BUTTONS = MAX_EV_BUTTON_IDS.map(maxEVButtonId => {
+        return document.getElementById(maxEVButtonId);
+    });
 
     const MIN_EV_BUTTONS = MIN_EV_BUTTON_IDS.map(minEVButtonId => {
         return document.getElementById(minEVButtonId);
     });
 
-    const MAX_EV_BUTTONS = MAX_EV_BUTTON_IDS.map(maxEVButtonId => {
-        return document.getElementById(maxEVButtonId);
-    });
-
-    const SUM_EV_H = document.getElementById(SUM_EV_H_ID);
-    console.log(getSumEV(EV_INPUTS));
-    SUM_EV_H.innerText = getSumEVText(getSumEV(EV_INPUTS));
+    const SUM_EV_HEADING = document.getElementById(SUM_EV_HEADING_ID);
 
     EV_INPUTS.map((evInput, i) => {
         evInput.min = MIN_EV;
@@ -400,13 +418,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
             if (getSumEV(EV_INPUTS) > MAX_SUM_EV) {
                 event.target.value -= EFFECT_EV;
             } else {
-                updateSumEVInnerText(EV_INPUTS, SUM_EV_H);
+                updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
             }
-        });
-
-        MIN_EV_BUTTONS[i].addEventListener("click", () => {
-            evInput.value = MIN_EV;
-            updateSumEVInnerText(EV_INPUTS, SUM_EV_H);         
         });
 
         MAX_EV_BUTTONS[i].addEventListener("click", () => {
@@ -416,23 +429,33 @@ document.addEventListener("DOMContentLoaded", (event) => {
             } else {
                 evInput.value = Math.floor(remainingEV / EFFECT_EV) * EFFECT_EV;
             }
-            updateSumEVInnerText(EV_INPUTS, SUM_EV_H);
+            updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
+        });
+
+        MIN_EV_BUTTONS[i].addEventListener("click", () => {
+            evInput.value = MIN_EV;
+            updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);         
         });
     });
 
-    const BREED_BUTTON = document.getElementById(BREED_BUTTON_ID);
-    BREED_BUTTON.addEventListener("click", () => {
-        console.clear();
-        const movesetNames = [
+    SUM_EV_HEADING.innerText = getSumEVText(getSumEV(EV_INPUTS));
+
+    function makePokemon() {
+        const moveNames = [
             MOVE_SELECTS[0].value, MOVE_SELECTS[1].value,
             MOVE_SELECTS[2].value, MOVE_SELECTS[3].value,
-        ].filter(moveName => {
-            return moveName != EMPTY;
-        });
+        ]
+
+        const pointUps = [
+            POINT_UP_INPUTS[0].value, POINT_UP_INPUTS[1].value,
+            POINT_UP_INPUTS[2].value, POINT_UP_INPUTS[3].value,
+        ]
 
         const moveset = {}
-        movesetNames.map(moveName => {
-            moveset[moveName] = {max:15, current:10}
+        moveNames.map(moveName => {
+            if (moveName != EMPTY) {
+                moveset[moveName] = {max:15, current:10}
+            }
         });
 
         const ivStat = {
@@ -453,15 +476,20 @@ document.addEventListener("DOMContentLoaded", (event) => {
             speed:parseInt(EV_INPUTS[5].value, 10),
         };
 
-        const pokemon = {
+        return {
             name: POKEMON_SELECT.value,
             nature: NATURE_SELECT.value,
+            moveNames:moveNames,
+            pointUps:pointUps,
             moveset:moveset,
-            ivstat:ivStat,
+            ivStat:ivStat,
             evStat:evStat,
         };
-        console.log(pokemon);
+    }
 
+    const BREED_BUTTON = document.getElementById(BREED_BUTTON_ID);
+    BREED_BUTTON.addEventListener("click", () => {
+        const pokemon = makePokemon();
         let jsonString = JSON.stringify(pokemon, null, 2);
         let blob = new Blob([jsonString], { type: "application/json" });
         let url = URL.createObjectURL(blob);
@@ -472,5 +500,54 @@ document.addEventListener("DOMContentLoaded", (event) => {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+    });
+
+    const FILE_LOAD_INPUT = document.getElementById("file-load-input");
+    FILE_LOAD_INPUT.addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const pokemon = JSON.parse(e.target.result);
+
+            POKEMON_SELECT.value = pokemon.name;
+            switchLearnset(pokemon.name, MOVE_SELECTS);
+
+            NATURE_SELECT.value = pokemon.nature;
+
+            pokemon.moveNames.map((moveName, i) => {
+                MOVE_SELECTS[i].value = moveName;
+            });
+
+            pokemon.pointUps.map((pointUp, i) => {
+                POINT_UP_INPUTS[i].value = pointUp;
+            });
+
+            IV_INPUTS[0].value = pokemon.ivStat.hp;
+            IV_INPUTS[1].value = pokemon.ivStat.atk;
+            IV_INPUTS[2].value = pokemon.ivStat.def;
+            IV_INPUTS[3].value = pokemon.ivStat.spAtk;
+            IV_INPUTS[4].value = pokemon.ivStat.spDef;
+            IV_INPUTS[5].value = pokemon.ivStat.speed;
+
+            EV_INPUTS[0].value = pokemon.evStat.hp;
+            EV_INPUTS[1].value = pokemon.evStat.atk;
+            EV_INPUTS[2].value = pokemon.evStat.def;
+            EV_INPUTS[3].value = pokemon.evStat.spAtk;
+            EV_INPUTS[4].value = pokemon.evStat.spDef;
+            EV_INPUTS[5].value = pokemon.evStat.speed;
+
+            SUM_EV_HEADING.innerText = getSumEVText(getSumEV(EV_INPUTS));
+            POKEMON_IMG.src = getPokemonImgPath(pokemon.name);
+        };
+        reader.readAsText(file);
+    });
+
+    const PAGE_BACK_BUTTON = document.getElementById("page-back-button");
+    PAGE_BACK_BUTTON.addEventListener("click", function(event) {
+        // ここにブラウザバック時の処理を記述
+        const pokemon = makePokemon();
+        sessionStorage.setItem(INDEX, JSON.stringify(pokemon));
+        console.log('ブラウザバックが発生しました');
+        // 他の処理もここに書く
     });
 });
