@@ -1,13 +1,11 @@
-const INDEX = new URLSearchParams(window.location.search).get("index");
+const TEAM_INDEX = parseInt(new URLSearchParams(window.location.search).get("team_index"), 10);
 
-var INIT_POKEMON = function() {
-    const item = sessionStorage.getItem(INDEX);
-    if (item === null) {
-        return new Pokemon();
-    } else {
-        return objectToPokemon(JSON.parse(item));
-    }
-}();
+let INIT_POKEMON;
+
+const initPokemonSetter = initPokemonSessionStorageSetter
+    .then(() => {
+        INIT_POKEMON = PokemonSessionStorage.get(TEAM_INDEX);
+    });
 
 const MOVE_SELECT_IDS = [
     "move1-select",
@@ -161,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const POKEMON_IMG = document.getElementById(POKEMON_IMG_ID);
 
-    baseDataLoader
+    initPokemonSetter
         .then(() => {
             ALL_POKE_NAMES.map(pokeName => {
                 option = document.createElement("option");
@@ -180,9 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         })
         .then(() => {
-            console.log(INIT_POKEMON);
             if (INIT_POKEMON.name !== null) {
-                console.log("侵入");
                 POKEMON_SELECT.value = INIT_POKEMON.name;
                 switchLearnset(POKEMON_SELECT.value, MOVE_SELECTS);
                 POKEMON_IMG.src = getPokemonImgPath(POKEMON_SELECT.value);
@@ -230,34 +226,37 @@ document.addEventListener("DOMContentLoaded", () => {
         return document.getElementById(minIVButtonID);
     });
 
-    IV_INPUTS.map((ivInput, i) => {
-        ivInput.min = MIN_IV;
-        ivInput.max = MAX_IV;
-        const initIV = INIT_POKEMON.getIVArray()[i];
-        if (initIV !== null) {
-            ivInput.value = initIV;
-        } else {
-            ivInput.value = MAX_IV;
-        }
-        ivInput.step = 1;
-
-        ivInput.addEventListener("keydown", () => {
-            const key = event.key;
-            if (key === "ArrowUp" || key === "ArrowDown" || key === "Tab") {
-                return;
-            } else {
-                event.preventDefault();
-            }
+    initPokemonSetter
+        .then(() => {
+            IV_INPUTS.map((ivInput, i) => {
+                ivInput.min = MIN_IV;
+                ivInput.max = MAX_IV;
+                const initIV = INIT_POKEMON.getIVArray()[i];
+                if (initIV !== null) {
+                    ivInput.value = initIV;
+                } else {
+                    ivInput.value = MAX_IV;
+                }
+                ivInput.step = 1;
+        
+                ivInput.addEventListener("keydown", () => {
+                    const key = event.key;
+                    if (key === "ArrowUp" || key === "ArrowDown" || key === "Tab") {
+                        return;
+                    } else {
+                        event.preventDefault();
+                    }
+                });
+        
+                MAX_IV_BUTTONS[i].addEventListener("click", () => {
+                    ivInput.value = MAX_IV;
+                });
+        
+                MIN_IV_BUTTONS[i].addEventListener("click", () => {
+                    ivInput.value = MIN_IV;
+                });
+            });
         });
-
-        MAX_IV_BUTTONS[i].addEventListener("click", () => {
-            ivInput.value = MAX_IV;
-        });
-
-        MIN_IV_BUTTONS[i].addEventListener("click", () => {
-            ivInput.value = MIN_IV;
-        });
-    });
 
     const EV_INPUTS = EV_INPUT_IDS.map(evInputID => {
         return document.getElementById(evInputID);
@@ -273,50 +272,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const SUM_EV_HEADING = document.getElementById(SUM_EV_HEADING_ID);
 
-    EV_INPUTS.map((evInput, i) => {
-        evInput.min = MIN_EV;
-        evInput.max = MAX_EV;
-
-        const initEV = INIT_POKEMON.getEVArray()[i];
-        if (initEV !== null) {
-            evInput.value = initEV;
-        } else {
-            evInput.value = MIN_EV;
-        }
-        evInput.step = EFFECT_EV;
+    initPokemonSetter
+        .then(() => {
+            EV_INPUTS.map((evInput, i) => {
+                evInput.min = MIN_EV;
+                evInput.max = MAX_EV;
         
-        evInput.addEventListener("keydown", event => {
-            const key = event.key;
-            if (key === "ArrowUp" || key === "ArrowDown" || key === "Tab") {
-                return;
-            } else {
-                event.preventDefault();
-            }
+                const initEV = INIT_POKEMON.getEVArray()[i];
+                if (initEV !== null) {
+                    evInput.value = initEV;
+                } else {
+                    evInput.value = MIN_EV;
+                }
+                evInput.step = EFFECT_EV;
+                
+                evInput.addEventListener("keydown", event => {
+                    const key = event.key;
+                    if (key === "ArrowUp" || key === "ArrowDown" || key === "Tab") {
+                        return;
+                    } else {
+                        event.preventDefault();
+                    }
+                });
+        
+                evInput.addEventListener("input", event => {
+                    if (getSumEV(EV_INPUTS) > MAX_SUM_EV) {
+                        event.target.value -= EFFECT_EV;
+                    } else {
+                        updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
+                    }
+                });
+        
+                MAX_EV_BUTTONS[i].addEventListener("click", () => {
+                    const remainingEV = MAX_SUM_EV - getSumEV(EV_INPUTS) + parseInt(evInput.value, 10);
+                    if (remainingEV >= MAX_EV) {
+                        evInput.value = MAX_EV;
+                    } else {
+                        evInput.value = Math.floor(remainingEV / EFFECT_EV) * EFFECT_EV;
+                    }
+                    updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
+                });
+        
+                MIN_EV_BUTTONS[i].addEventListener("click", () => {
+                    evInput.value = MIN_EV;
+                    updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);         
+                });
+            });
         });
-
-        evInput.addEventListener("input", event => {
-            if (getSumEV(EV_INPUTS) > MAX_SUM_EV) {
-                event.target.value -= EFFECT_EV;
-            } else {
-                updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
-            }
-        });
-
-        MAX_EV_BUTTONS[i].addEventListener("click", () => {
-            const remainingEV = MAX_SUM_EV - getSumEV(EV_INPUTS) + parseInt(evInput.value, 10);
-            if (remainingEV >= MAX_EV) {
-                evInput.value = MAX_EV;
-            } else {
-                evInput.value = Math.floor(remainingEV / EFFECT_EV) * EFFECT_EV;
-            }
-            updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
-        });
-
-        MIN_EV_BUTTONS[i].addEventListener("click", () => {
-            evInput.value = MIN_EV;
-            updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);         
-        });
-    });
 
     SUM_EV_HEADING.innerText = getSumEVText(getSumEV(EV_INPUTS));
 
@@ -420,10 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const PAGE_BACK_BUTTON = document.getElementById("page-back-button");
     PAGE_BACK_BUTTON.addEventListener("click", function(event) {
-        // ここにブラウザバック時の処理を記述
         const pokemon = makePokemon();
-        sessionStorage.setItem(INDEX, JSON.stringify(pokemon));
-        console.log('ブラウザバックが発生しました');
-        // 他の処理もここに書く
+        PokemonSessionStorage.set(pokemon, TEAM_INDEX);
     });
 });

@@ -36,6 +36,17 @@ class Pokemon {
         ];
     }
 
+    setMaxIVStat() {
+        this.ivStat = {
+            hp:MAX_IV,
+            atk:MAX_IV,
+            def:MAX_IV,
+            spAtk:MAX_IV,
+            spDef:MAX_IV,
+            speed:MAX_IV,
+        };
+    }
+
     getEVArray() {
         return [
             this.evStat.hp,
@@ -45,6 +56,17 @@ class Pokemon {
             this.evStat.spDef,
             this.evStat.speed,
         ];
+    }
+
+    setMinEVStat() {
+        this.evStat = {
+            hp:MIN_EV,
+            atk:MIN_EV,
+            def:MIN_EV,
+            spAtk:MIN_EV,
+            spDef:MIN_EV,
+            speed:MIN_EV,
+        };
     }
 }
 
