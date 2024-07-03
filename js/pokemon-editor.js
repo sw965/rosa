@@ -1,4 +1,5 @@
 const TEAM_INDEX = parseInt(new URLSearchParams(window.location.search).get("team_index"), 10);
+console.log("team_index", TEAM_INDEX);
 
 let INIT_POKEMON;
 
@@ -318,9 +319,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);         
                 });
             });
+        })
+        .then(() => {
+            SUM_EV_HEADING.innerText = getSumEVText(getSumEV(EV_INPUTS));
         });
-
-    SUM_EV_HEADING.innerText = getSumEVText(getSumEV(EV_INPUTS));
 
     function makePokemon() {
         const moveNames = [

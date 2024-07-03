@@ -1,6 +1,6 @@
 let ALL_POKE_NAMES;
 const allPokeNamesLoader =
-fetch(makeFullURL("all_poke_names"))
+fetch(makeDawnFullURL("all_poke_names"))
     .then(response => {
         return response.json();
     })
@@ -13,7 +13,7 @@ fetch(makeFullURL("all_poke_names"))
 
 let POKEDEX;
 const pokedexLoader =
-    fetch(makeFullURL("pokedex"))
+    fetch(makeDawnFullURL("pokedex"))
         .then(response => {
             return response.json();
         })
@@ -26,7 +26,7 @@ const pokedexLoader =
 
 let ALL_NATURES
 const allNaturesLoader =
-    fetch(makeFullURL("all_natures"))
+    fetch(makeDawnFullURL("all_natures"))
         .then(response => {
             return response.json();
         })

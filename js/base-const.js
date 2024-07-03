@@ -14,3 +14,6 @@ const EFFECT_EV = 4;
 
 const MIN_TEAM_NUM = 3;
 const MAX_TEAM_NUM = 6;
+
+const PLAYER_NUM = 2;
+const MAX_BOTH_TEAM_NUM = MAX_TEAM_NUM * PLAYER_NUM;
