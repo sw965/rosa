@@ -1,5 +1,4 @@
 const TEAM_INDEX = parseInt(new URLSearchParams(window.location.search).get("team_index"), 10);
-console.log("team_index", TEAM_INDEX);
 
 let INIT_POKEMON;
 
@@ -17,7 +16,7 @@ const MOVE_SELECT_IDS = [
 
 function switchLearnset(pokeName, moveSelects) {
     moveSelects.map(moveSelect => {
-        options = Array.from(moveSelect.options)
+        const options = Array.from(moveSelect.options);
         options.map(option => {
             moveSelect.removeChild(option);
         });
@@ -28,7 +27,7 @@ function switchLearnset(pokeName, moveSelects) {
         const moveSelect = moveSelects[i];
         let moveSelectValues;
         if (i != 0) {
-            moveSelectValues = learnset.concat()
+            moveSelectValues = learnset.concat();
             moveSelectValues.unshift(EMPTY);
         } else {
             moveSelectValues = learnset;
@@ -61,11 +60,31 @@ function updateMoveSelects(moveSelects) {
     });
 }
 
-const POINT_UP_INPUT_IDS = [
-    "move1-point-up-input",
-    "move2-point-up-input",
-    "move3-point-up-input",
-    "move4-point-up-input",
+function switchPointUpSelect(pointUpSelect, moveName) {
+    const options = Array.from(pointUpSelect.options);
+    options.map(option => {
+        pointUpSelect.removeChild(option);
+    });
+
+    if (moveName === EMPTY) {
+        return
+    }
+
+    console.log(moveName);
+    const basePP = MOVEDEX[moveName].BasePP;
+    ALL_POINT_UPS.toReversed().map(pointUp => {
+        const option = document.createElement("option");
+        option.value = pointUp;
+        option.innerText = `${pointUp}(${calcPowerPoint(basePP, pointUp)})`;
+        pointUpSelect.appendChild(option);
+    });
+}
+
+const POINT_UP_SELECT_IDS = [
+    "move1-point-up-select",
+    "move2-point-up-select",
+    "move3-point-up-select",
+    "move4-point-up-select",
 ];
 
 const IV_INPUT_IDS = [
@@ -158,10 +177,15 @@ document.addEventListener("DOMContentLoaded", () => {
         return document.getElementById(moveSelectId);
     });
 
+    const POINT_UP_SELECTS = POINT_UP_SELECT_IDS.map(pointUpSelectId => {
+        return document.getElementById(pointUpSelectId);
+    });
+
     const POKEMON_IMG = document.getElementById(POKEMON_IMG_ID);
 
     initPokemonSetter
         .then(() => {
+            console.log("moveset", INIT_POKEMON.moveset);
             ALL_POKE_NAMES.map(pokeName => {
                 option = document.createElement("option");
                 option.innerText = pokeName;
@@ -196,28 +220,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     moveSelect.value = INIT_POKEMON.moveNames[i];
                 });
             }
+
+            MOVE_SELECTS.map((moveSelect, i) => {
+                moveSelect.addEventListener("change", () => {
+                    updateMoveSelects(MOVE_SELECTS);
+                    switchPointUpSelect(POINT_UP_SELECTS[i], moveSelect.value);
+                });
+            });
+
+            POINT_UP_SELECTS.map((pointUpSelect, i) => {
+                switchPointUpSelect(pointUpSelect, MOVE_SELECTS[i].value);
+            });
         });
-
-    MOVE_SELECTS.map(moveSelect => {
-        moveSelect.addEventListener("change", () => {
-            updateMoveSelects(MOVE_SELECTS);
-        });
-    });
-
-    const POINT_UP_INPUTS = POINT_UP_INPUT_IDS.map(pointUpInputId => {
-        return document.getElementById(pointUpInputId);
-    });
-
-    POINT_UP_INPUTS.map(pointUpInput => {
-        pointUpInput.min = MIN_POINT_UP;
-        pointUpInput.max = MAX_POINT_UP;
-        pointUpInput.value = MAX_POINT_UP;
-        pointUpInput.step = 1;
-    })
 
     const IV_INPUTS = IV_INPUT_IDS.map(ivInputId => {
         return document.getElementById(ivInputId);
-    })
+    });
 
     const MAX_IV_BUTTONS = MAX_IV_BUTTON_IDS.map(maxIVButtonID => {
         return document.getElementById(maxIVButtonID);
@@ -331,16 +349,9 @@ document.addEventListener("DOMContentLoaded", () => {
         ]
 
         const pointUps = [
-            POINT_UP_INPUTS[0].value, POINT_UP_INPUTS[1].value,
-            POINT_UP_INPUTS[2].value, POINT_UP_INPUTS[3].value,
+            POINT_UP_SELECTS[0].value, POINT_UP_SELECTS[1].value,
+            POINT_UP_SELECTS[2].value, POINT_UP_SELECTS[3].value,
         ]
-
-        const moveset = {}
-        moveNames.map(moveName => {
-            if (moveName != EMPTY) {
-                moveset[moveName] = {max:15, current:10}
-            }
-        });
 
         const ivStat = {
             hp:parseInt(IV_INPUTS[0].value, 10),
@@ -365,32 +376,36 @@ document.addEventListener("DOMContentLoaded", () => {
         pokemon.nature = NATURE_SELECT.value;
         pokemon.moveNames = moveNames;
         pokemon.pointUps = pointUps;
-        pokemon.moveset = moveset;
+        const movesetUpdater = pokemon.updateMoveset();
         pokemon.ivStat = ivStat;
         pokemon.evStat = evStat;
-        return pokemon;
+        return {pokemon:pokemon, movesetUpdater:movesetUpdater};
     }
 
     const FILE_SAVE_BUTTON = document.getElementById(FILE_SAVE_BUTTON_ID);
     FILE_SAVE_BUTTON.addEventListener("click", () => {
-        const pokemon = makePokemon();
-        let jsonString = JSON.stringify(pokemon, null, 2);
-        let blob = new Blob([jsonString], { type: "application/json" });
-        let url = URL.createObjectURL(blob);
-
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = "person.json";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const result = makePokemon();
+        result.movesetUpdater
+            .then(() => {
+                const pokemon = result.pokemon;
+                let jsonString = JSON.stringify(pokemon, null, 2);
+                let blob = new Blob([jsonString], { type: "application/json" });
+                let url = URL.createObjectURL(blob);
+        
+                let a = document.createElement('a');
+                a.href = url;
+                a.download = "person.json";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
     });
 
     const FILE_LOAD_INPUT = document.getElementById("file-load-input");
-    FILE_LOAD_INPUT.addEventListener("change", function(event) {
+    FILE_LOAD_INPUT.addEventListener("change", event => {
         const file = event.target.files[0];
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = e => {
             const pokemon = objectToPokemon(JSON.parse(e.target.result));
 
             POKEMON_SELECT.value = pokemon.name;
@@ -423,8 +438,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const PAGE_BACK_BUTTON = document.getElementById("page-back-button");
-    PAGE_BACK_BUTTON.addEventListener("click", function(event) {
-        const pokemon = makePokemon();
-        PokemonSessionStorage.set(pokemon, TEAM_INDEX);
+    PAGE_BACK_BUTTON.addEventListener("click", () => {
+        const result = makePokemon();
+        result.movesetUpdater
+            .then(() => {
+                const pokemon = result.pokemon;
+                PokemonSessionStorage.set(pokemon, TEAM_INDEX);
+            });
     });
 });

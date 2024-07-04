@@ -18,6 +18,7 @@ class PokemonSessionStorage {
     }
 
     static set(pokemon, teamIndex) {
+        console.log("pss set", pokemon);
         const key = PokemonSessionStorage.keys[teamIndex];
         sessionStorage.setItem(key, JSON.stringify(pokemon));
     }
@@ -54,7 +55,12 @@ const initPokemonSessionStorageSetter = baseDataLoader
             if (pokemon.pointUps === null) {
                 pokemon.pointUps = [MAX_POINT_UP, MAX_POINT_UP, MAX_POINT_UP, MAX_POINT_UP];
             }
-    
+
+            if (pokemon.moveset === null) {
+                pokemon.updateMoveset();
+                console.log("pokemon", pokemon);
+            }
+
             if (pokemon.ivStat.hp === null) {
                 pokemon.ivStat.hp = MAX_IV;
             }
@@ -102,6 +108,7 @@ const initPokemonSessionStorageSetter = baseDataLoader
             if (pokemon.evStat.speed === null) {
                 pokemon.evStat.speed = MIN_EV;
             }
+            console.log("init set");
             PokemonSessionStorage.set(pokemon, i);
         });
     });

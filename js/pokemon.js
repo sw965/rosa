@@ -5,6 +5,7 @@ class Pokemon {
 
         this.moveNames = null;
         this.pointUps = null;
+        this.moveset = null;
 
         this.ivStat = {
             hp:null,
@@ -23,6 +24,19 @@ class Pokemon {
             spDef:null,
             speed:null,
         };
+    }
+    
+    updateMoveset() {
+        const moveset = {};
+        this.moveNames.filter(moveName => {
+            return moveName !== EMPTY;
+        }).map((moveName, i) => {
+            const pointUp = this.pointUps[i];
+            const moveData = MOVEDEX[moveName];
+            const pp = calcPowerPoint(moveData.BasePP, pointUp);
+             moveset[moveName] = {max:pp, current:pp};
+        })
+        this.moveset = moveset;
     }
 
     getIVArray() {
@@ -76,6 +90,7 @@ function objectToPokemon(obj) {
     pokemon.nature = obj.nature;
     pokemon.moveNames = obj.moveNames;
     pokemon.pointUps = obj.pointUps;
+    pokemon.moveset = obj.moveset;
     pokemon.ivStat = obj.ivStat;
     pokemon.evStat = obj.evStat;
     return pokemon;

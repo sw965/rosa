@@ -22,7 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
     MOVE_BUTTONS.map((moveButton, i) => {
         moveButton.addEventListener("click", () => {
             const bothTeam = PokemonSessionStorage.getBothTeam();
+            console.log("bothTeam", bothTeam);
             const selfTeam = bothTeam.slice(0, MAX_TEAM_NUM);
+            console.log("selfTeam[0]", selfTeam[0]);
             const opponentTeam = bothTeam.slice(MAX_TEAM_NUM, MAX_BOTH_TEAM_NUM);
             fetch(makeCaitlinFullURL(selfTeam, opponentTeam, undefined))
                 .then(response => {

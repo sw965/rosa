@@ -8,12 +8,14 @@
     <script src="js/url.js"></script>
     <script src="js/base-data.js"></script>
     <script src="js/base-const.js"></script>
+    <script src="js/move-func.js"></script>
     <script src="js/pokemon.js"></script>
     <script src="js/session-storage.js"></script>
     <script src="js/pokemon-editor.js"></script>
     <style>
         table {
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         table, tr, td {
@@ -21,7 +23,7 @@
         }
 
         td {
-            padding: 0px;
+            padding: 3px;
             text-align: center; 
         }
 
@@ -57,61 +59,61 @@
 
         <tr>
             <td>
-                <label class="form-label" for="move1-select">技1</label>
+                <label for="move1-select">技1</label>
             </td>
             <td>
                 <select id="move1-select"></select>
             </td>
             <td>
-                <label for="move1-point-up-input">ポイントアップ</label>
+                <label for="move1-point-up-select">ポイントアップ(最大PP)</label>
             </td>
             <td>
-                <input type="number" id="move1-point-up-input">
+                <select id="move1-point-up-select"></select>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label class="form-label" for="move2-select">技2</label>
+                <label for="move2-select">技2</label>
             </td>
             <td>
                 <select id="move2-select"></select>
             </td>
             <td>
-                <label for="move2-point-up-input">ポイントアップ</label>
+                <label for="move2-point-up-select">ポイントアップ(最大PP)</label>
             </td>
             <td>
-                <input type="number" id="move2-point-up-input">
+                <select id="move2-point-up-select"></select>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label class="form-label" for="move3-select">技3</label>
+                <label for="move3-select">技3</label>
             </td>
             <td>
                 <select id="move3-select"></select>
             </td>
             <td>
-                <label for="move3-point-up-input">ポイントアップ</label>
+                <label for="move3-point-up-select">ポイントアップ(最大PP)</label>
             </td>
             <td>
-                <input type="number" id="move3-point-up-input">
+                <select id="move3-point-up-select"></select>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label class="form-label" for="move4-select">技4</label>
+                <label for="move4-select">技4</label>
             </td>
             <td>
                 <select id="move4-select"></select>
             </td>
             <td>
-                <label for="move4-point-up-input">ポイントアップ</label>
+                <label for="move4-point-up-select">ポイントアップ(最大PP)</label>
             </td>
             <td>
-                <input type="number" id="move4-point-up-input">
+                <select id="move4-point-up-select"></select>
             </td>
         </tr>
 
@@ -297,10 +299,14 @@
 
         <tr>
             <td colspan="4">
-                <h3 id="sum-ev-h3">合計努力値 : 0</h3>
+                <h3 id="sum-ev-h3"></h3>
             </td>
         </tr>
-
+            <td colspan="4">
+                <h3></h3>
+            </td>
+        <tr>
+        </tr>
         <tr>
             <td colspan="2">
                 <img id="pokemon-img">
