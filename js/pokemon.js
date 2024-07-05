@@ -34,7 +34,7 @@ class Pokemon {
             const pointUp = this.pointUps[i];
             const moveData = MOVEDEX[moveName];
             const pp = calcPowerPoint(moveData.BasePP, pointUp);
-             moveset[moveName] = {max:pp, current:pp};
+            moveset[moveName] = {max:pp, current:pp};
         })
         this.moveset = moveset;
     }
@@ -94,4 +94,22 @@ function objectToPokemon(obj) {
     pokemon.ivStat = obj.ivStat;
     pokemon.evStat = obj.evStat;
     return pokemon;
+}
+
+class StatCalculator {
+    constructor(base, level, iv, ev) {
+        this.base = base;
+        this.level = level;
+        this.iv = iv;
+        this.ev = ev;
+    }
+
+    hp() {
+        return ((this.base*2 + this.iv + this.ev/4) * this.level / 100) + this.level + 10;
+    }
+
+    hpOther(bonus) {
+        const stat = (this.base*2 + this.iv + this.ev/4) * this.level / 100 + 5;
+        return parseInt(stat * bonus, 10);
+    }
 }

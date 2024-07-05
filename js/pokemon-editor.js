@@ -60,6 +60,10 @@ function updateMoveSelects(moveSelects) {
     });
 }
 
+function getPointUpInnerText(pointUp, basePP) {
+    return `${pointUp}(${calcPowerPoint(basePP, pointUp)})`
+}
+
 function switchPointUpSelect(pointUpSelect, moveName) {
     const options = Array.from(pointUpSelect.options);
     options.map(option => {
@@ -70,12 +74,11 @@ function switchPointUpSelect(pointUpSelect, moveName) {
         return
     }
 
-    console.log(moveName);
     const basePP = MOVEDEX[moveName].BasePP;
     ALL_POINT_UPS.toReversed().map(pointUp => {
         const option = document.createElement("option");
         option.value = pointUp;
-        option.innerText = `${pointUp}(${calcPowerPoint(basePP, pointUp)})`;
+        option.innerText = getPointUpInnerText(pointUp, basePP);
         pointUpSelect.appendChild(option);
     });
 }
@@ -185,7 +188,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initPokemonSetter
         .then(() => {
-            console.log("moveset", INIT_POKEMON.moveset);
             ALL_POKE_NAMES.map(pokeName => {
                 option = document.createElement("option");
                 option.innerText = pokeName;
@@ -231,6 +233,15 @@ document.addEventListener("DOMContentLoaded", () => {
             POINT_UP_SELECTS.map((pointUpSelect, i) => {
                 switchPointUpSelect(pointUpSelect, MOVE_SELECTS[i].value);
             });
+
+            if (INIT_POKEMON.pointUps !== null) {
+                POINT_UP_SELECTS.map((pointUpSelect, i) => {
+                    const moveName = MOVE_SELECTS[i].value
+                    if (moveName !== EMPTY) {
+                        pointUpSelect.value = INIT_POKEMON.pointUps[i];
+                    }
+                });
+            }
         });
 
     const IV_INPUTS = IV_INPUT_IDS.map(ivInputId => {
@@ -376,22 +387,21 @@ document.addEventListener("DOMContentLoaded", () => {
         pokemon.nature = NATURE_SELECT.value;
         pokemon.moveNames = moveNames;
         pokemon.pointUps = pointUps;
-        const movesetUpdater = pokemon.updateMoveset();
+        pokemon.updateMoveset();
         pokemon.ivStat = ivStat;
         pokemon.evStat = evStat;
-        return {pokemon:pokemon, movesetUpdater:movesetUpdater};
+        return pokemon;
     }
 
     const FILE_SAVE_BUTTON = document.getElementById(FILE_SAVE_BUTTON_ID);
-    FILE_SAVE_BUTTON.addEventListener("click", () => {
-        const result = makePokemon();
-        result.movesetUpdater
-            .then(() => {
-                const pokemon = result.pokemon;
+    movedexLoader
+        .then(() => {
+            FILE_SAVE_BUTTON.addEventListener("click", () => {
+                const pokemon = makePokemon();
                 let jsonString = JSON.stringify(pokemon, null, 2);
                 let blob = new Blob([jsonString], { type: "application/json" });
                 let url = URL.createObjectURL(blob);
-        
+                
                 let a = document.createElement('a');
                 a.href = url;
                 a.download = "person.json";
@@ -399,7 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 a.click();
                 document.body.removeChild(a);
             });
-    });
+        });
 
     const FILE_LOAD_INPUT = document.getElementById("file-load-input");
     FILE_LOAD_INPUT.addEventListener("change", event => {
@@ -438,12 +448,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const PAGE_BACK_BUTTON = document.getElementById("page-back-button");
-    PAGE_BACK_BUTTON.addEventListener("click", () => {
-        const result = makePokemon();
-        result.movesetUpdater
-            .then(() => {
-                const pokemon = result.pokemon;
+
+    movedexLoader.
+        then(() => {
+            PAGE_BACK_BUTTON.addEventListener("click", () => {
+                const pokemon = makePokemon();
                 PokemonSessionStorage.set(pokemon, TEAM_INDEX);
+                history.back();
             });
-    });
+
+            history.replaceState(null, null, null);
+            window.addEventListener("popstate", () => {
+                if (!event.state) {
+                    console.log("popstateイベントが発生したわ！");
+                    const pokemon = makePokemon();
+                    PokemonSessionStorage.set(pokemon, TEAM_INDEX);
+                }
+            });
+        });
 });

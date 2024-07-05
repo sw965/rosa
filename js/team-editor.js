@@ -22,6 +22,7 @@ function setBothTeamPokemonImg(bothTeam, pokemonAnchors) {
         url.searchParams.append("poke_name", pokemon.name);
         pokemonAnchors[i].href = url.toString();
         const img = document.createElement("img");
+        img.id = i;
         img.src = "img/" + pokemon.name + ".gif";
         pokemonAnchors[i].appendChild(img);
     });
@@ -38,12 +39,57 @@ document.addEventListener("DOMContentLoaded", () => {
             const bothTeam = PokemonSessionStorage.getBothTeam();
             setBothTeamPokemonImg(bothTeam, POKEMON_ANCHORS);
             BATTLE_START_BUTTON.addEventListener("click", () => {
-                console.log("バトル開始");
-                location.href = "vs-caitlin.html";
+                const bothTeam = PokemonSessionStorage.getBothTeam();
+                const selfTeam = bothTeam.slice(0, MAX_TEAM_NUM-3);
+                const opponentTeam = bothTeam.slice(MAX_TEAM_NUM, MAX_BOTH_TEAM_NUM-3);
+                fetch(makeCaitlinFullURL(selfTeam, opponentTeam, null))
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then((json) => {
+                        location.href = "vs-caitlin.html";
+                    })
             });
         })
         .catch(err => {
             alert("dawn.exeファイルが実行されていないかもしれません。");
             console.error(err);
         });
+
+        let draggedImg;
+        initPokemonSessionStorageSetter
+            .then(() => {
+                document.addEventListener("dragstart", (event) => {
+                    draggedImg = event.target;
+                    event.target.style.opacity = 0.5;
+                });
+        
+                document.addEventListener("dragend", (event) => {
+                    event.target.style.opacity = "";
+                });
+        
+                document.addEventListener("dragover", (event) => {
+                    event.preventDefault();
+                });
+        
+                document.addEventListener("drop", (event) => {
+                    if (event.target.tagName !== "IMG") {
+                        return
+                    }
+
+                    const targetSrc = event.target.src;
+                    const targetIndex = parseInt(event.target.id, 10);
+
+                    const draggedSrc = draggedImg.src;
+                    const draggedIndex = parseInt(draggedImg.id, 10);
+
+                    const targetPokemon = PokemonSessionStorage.get(targetIndex);
+                    const dragendPokemon = PokemonSessionStorage.get(draggedIndex);
+                    event.target.src = draggedSrc;
+                    draggedImg.src = targetSrc;
+
+                    PokemonSessionStorage.set(targetPokemon, draggedIndex);
+                    PokemonSessionStorage.set(dragendPokemon, targetIndex);
+                })
+            });
 });
