@@ -47,6 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         return response.json();
                     })
                     .then((json) => {
+                        const battle = JSON.parse(JSON.stringify(json));
+                        sessionStorage.setItem("selfFighters", JSON.stringify(battle.SelfFighters));
+                        sessionStorage.setItem("opponentFighters", JSON.stringify(battle.OpponentFighters));
                         location.href = "vs-caitlin.html";
                     })
             });
