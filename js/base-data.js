@@ -51,7 +51,20 @@ const allNaturesLoader =
             });
         });
 
-const baseDataLoader = Promise.all([allPokeNamesLoader, pokedexLoader, movedexLoader, allNaturesLoader])
+let NATUREDEX;
+const naturedexLoader =
+    fetch(makeDawnFullURL("naturedex"))
+        .then(response => {
+            return response.json()
+        })
+        .then(json => {
+            return new Promise(resolve => {
+                NATUREDEX = JSON.parse(JSON.stringify(json));
+                resolve();
+            });
+        });
+
+const baseDataLoader = Promise.all([allPokeNamesLoader, pokedexLoader, movedexLoader, allNaturesLoader, naturedexLoader])
     .catch(err => {
         alert("dawn.exeファイルが実行されていないかもしれません。");
         console.error(err);

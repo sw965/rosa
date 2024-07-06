@@ -42,7 +42,11 @@ const initPokemonSessionStorageSetter = baseDataLoader
             if (pokemon.name === null) {
                 pokemon.name = pokeName;
             }
-    
+
+            if (pokemon.level === null) {
+                pokemon.level = STANDARD_LEVEL;
+            }
+
             if (pokemon.nature === null) {
                 pokemon.nature = ALL_NATURES[0];
             }
@@ -106,6 +110,8 @@ const initPokemonSessionStorageSetter = baseDataLoader
             if (pokemon.evStat.speed === null) {
                 pokemon.evStat.speed = MIN_EV;
             }
+            
+            pokemon.updateStat();
             PokemonSessionStorage.set(pokemon, i);
         });
     });

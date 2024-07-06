@@ -7,6 +7,9 @@ const initPokemonSetter = initPokemonSessionStorageSetter
         INIT_POKEMON = PokemonSessionStorage.get(TEAM_INDEX);
     });
 
+
+const LEVEL_INPUT_ID = "level-input";
+
 const MOVE_SELECT_IDS = [
     "move1-select",
     "move2-select",
@@ -141,6 +144,7 @@ const MIN_EV_BUTTON_IDS = [
 ]
 
 const SUM_EV_HEADING_ID = "sum-ev-h3";
+const STAT_HEADING_ID = "stat-h3";
 
 function getSumEVText(sumEV) {
     return "合計努力値 : " + String(sumEV);
@@ -158,6 +162,21 @@ function updateSumEVInnerText(evInputs, sumEVHeading) {
     sumEVHeading.innerText = getSumEVText(getSumEV(evInputs));
 }
 
+function getStatText(hp, atk, def, spAtk, spDef, speed) {
+    let text = "";
+    text += "(HP：" + hp + ")";
+    text += " (攻撃：" + atk + ")";
+    text += " (防御：" + def + ")";
+    text += " (特攻：" + spAtk + ")";
+    text += " (特防：" + spDef + ")";
+    text += " (素早さ：" + speed + ")";
+    return text;
+}
+
+function updateStatInnerText(statHeading, pokemon) {
+    statHeading.innerText = getStatText(pokemon.maxHP, pokemon.atk, pokemon.def, pokemon.spAtk, pokemon.spDef, pokemon.speed);
+}
+
 const POKEMON_IMG_ID = "pokemon-img";
 const FILE_SAVE_BUTTON_ID = "file-save-button";
 
@@ -171,11 +190,52 @@ document.addEventListener("DOMContentLoaded", () => {
     POKEMON_SELECT.addEventListener("change", () => {
         const pokeName = POKEMON_SELECT.value
         switchLearnset(pokeName, MOVE_SELECTS);
+        updateStatInnerText(STAT_HEADING, makePokemon());
         POKEMON_IMG.src = getPokemonImgPath(pokeName);
     });
 
+    const LEVEL_INPUT = document.getElementById("level-input");
+    LEVEL_INPUT.min = MIN_LEVEL;
+    LEVEL_INPUT.max = MAX_LEVEL;
+    LEVEL_INPUT.step = 1;
+    LEVEL_INPUT.value = STANDARD_LEVEL;
+
+    LEVEL_INPUT.addEventListener("keydown", () => {
+        const key = event.key;
+        if (key === "ArrowUp" || key === "ArrowDown" || key === "Tab") {
+            return;
+        } else {
+            event.preventDefault();
+        }
+    });
+
+    LEVEL_INPUT.addEventListener("input", () => {
+        updateStatInnerText(STAT_HEADING, makePokemon());
+    });
+
+    const MAX_LEVEL_BUTTON = document.getElementById("max-level-button");
+    MAX_LEVEL_BUTTON.addEventListener("click", ()=> {
+        LEVEL_INPUT.value = MAX_LEVEL;
+        updateStatInnerText(STAT_HEADING, makePokemon());
+    });
+
+    const STANDARD_LEVEL_BUTTON = document.getElementById("standard-level-button");
+    STANDARD_LEVEL_BUTTON.addEventListener("click", () => {
+        LEVEL_INPUT.value = STANDARD_LEVEL;
+        updateStatInnerText(STAT_HEADING, makePokemon());
+    })
+
+    const MIN_LEVEL_BUTTON = document.getElementById("min-level-button");
+    MIN_LEVEL_BUTTON.addEventListener("click", () => {
+        LEVEL_INPUT.value = MIN_LEVEL;
+        updateStatInnerText(STAT_HEADING, makePokemon());
+    });
+
     const NATURE_SELECT = document.getElementById("nature-select");
-    
+    NATURE_SELECT.addEventListener("change", () => {
+        updateStatInnerText(STAT_HEADING, makePokemon());
+    })
+
     const MOVE_SELECTS = MOVE_SELECT_IDS.map(moveSelectId => {
         return document.getElementById(moveSelectId);
     });
@@ -277,13 +337,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         event.preventDefault();
                     }
                 });
-        
+
+                ivInput.addEventListener("input", () => {
+                    updateStatInnerText(STAT_HEADING, makePokemon());
+                });
+
                 MAX_IV_BUTTONS[i].addEventListener("click", () => {
                     ivInput.value = MAX_IV;
+                    updateStatInnerText(STAT_HEADING, makePokemon());
                 });
         
                 MIN_IV_BUTTONS[i].addEventListener("click", () => {
                     ivInput.value = MIN_IV;
+                    updateStatInnerText(STAT_HEADING, makePokemon());
                 });
             });
         });
@@ -301,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const SUM_EV_HEADING = document.getElementById(SUM_EV_HEADING_ID);
+    const STAT_HEADING = document.getElementById(STAT_HEADING_ID);
 
     initPokemonSetter
         .then(() => {
@@ -331,6 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
                     }
+                    updateStatInnerText(STAT_HEADING, makePokemon());
                 });
         
                 MAX_EV_BUTTONS[i].addEventListener("click", () => {
@@ -340,17 +408,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         evInput.value = Math.floor(remainingEV / EFFECT_EV) * EFFECT_EV;
                     }
-                    updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
+                    updateStatInnerText(STAT_HEADING, makePokemon());
                 });
         
                 MIN_EV_BUTTONS[i].addEventListener("click", () => {
                     evInput.value = MIN_EV;
+                    updateStatInnerText(STAT_HEADING, makePokemon());
                     updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);         
                 });
             });
         })
         .then(() => {
             SUM_EV_HEADING.innerText = getSumEVText(getSumEV(EV_INPUTS));
+            console.log(makePokemon());
+            updateStatInnerText(STAT_HEADING, makePokemon());
         });
 
     function makePokemon() {
@@ -384,12 +455,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const pokemon = new Pokemon();
         pokemon.name = POKEMON_SELECT.value;
+        pokemon.level = parseInt(LEVEL_INPUT.value, 10);
         pokemon.nature = NATURE_SELECT.value;
         pokemon.moveNames = moveNames;
         pokemon.pointUps = pointUps;
         pokemon.updateMoveset();
         pokemon.ivStat = ivStat;
         pokemon.evStat = evStat;
+        pokemon.updateStat();
         return pokemon;
     }
 
@@ -455,15 +528,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const pokemon = makePokemon();
                 PokemonSessionStorage.set(pokemon, TEAM_INDEX);
                 history.back();
-            });
-
-            history.replaceState(null, null, null);
-            window.addEventListener("popstate", () => {
-                if (!event.state) {
-                    console.log("popstateイベントが発生したわ！");
-                    const pokemon = makePokemon();
-                    PokemonSessionStorage.set(pokemon, TEAM_INDEX);
-                }
             });
         });
 });

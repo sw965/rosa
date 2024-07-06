@@ -1,6 +1,10 @@
 const EMPTY = "なし";
-const MAX_MOVESET_NUM = 4;
 
+const MIN_LEVEL = 1;
+const STANDARD_LEVEL = 50;
+const MAX_LEVEL = 100;
+
+const MAX_MOVESET_NUM = 4;
 const ALL_POINT_UPS = [0, 1, 2, 3];
 
 const MIN_POINT_UP = Math.min(...ALL_POINT_UPS);
