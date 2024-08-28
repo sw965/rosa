@@ -8,10 +8,10 @@ function makeDawnFullURL(dataType) {
 
 const CAITLIN_BASE_URL = "http://localhost:8080/caitlin/";
 
-function makeCaitlinFullURL(selfTeam, opponentTeam, action) {
+function makeCaitlinFullURL(selfTeam, opponentTeam) {
     const url = new URL(CAITLIN_BASE_URL);
-    url.searchParams.append("self_team", encodeURIComponent(JSON.stringify(selfTeam)));
-    url.searchParams.append("opponent_team", encodeURIComponent(JSON.stringify(opponentTeam)));
-    url.searchParams.append("action", encodeURIComponent(action));
+    alert(JSON.stringify(selfTeam));
+    url.searchParams.append("selfTeam", encodeURIComponent(JSON.stringify(selfTeam)));
+    url.searchParams.append("opponentTeam", encodeURIComponent(JSON.stringify(opponentTeam)));
     return url.toString();
 }

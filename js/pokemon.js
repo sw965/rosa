@@ -26,13 +26,15 @@ class Pokemon {
             speed:null,
         };
 
-        this.maxHP = null;
-        this.currentHP = null;
-        this.atk = null;
-        this.def = null;
-        this.spAtk = null;
-        this.spDef = null;
-        this.speed = null;
+        this.stat = {
+            maxHP:null,
+            currentHP:null,
+            atk:null,
+            def:null,
+            spAtk:null,
+            spDef:null,
+            speed:null,
+        }
     }
     
     updateMoveset() {
@@ -95,53 +97,68 @@ class Pokemon {
     updateStat() {
         const pokeData = POKEDEX[this.name];
         const natureData = NATUREDEX[this.nature];
-        const hp = new StatCalculator(pokeData.BaseHP, this.level, this.ivStat.hp, this.evStat.hp).hp();
-        this.maxHP = hp;
-        this.currentHP = hp;
-        this.atk = new StatCalculator(pokeData.BaseAtk, this.level, this.ivStat.atk, this.evStat.atk).hpOther(natureData.AtkBonus);
-        this.def = new StatCalculator(pokeData.BaseDef, this.level, this.ivStat.def, this.evStat.def).hpOther(natureData.DefBonus);
-        this.spAtk = new StatCalculator(pokeData.BaseSpAtk, this.level, this.ivStat.spAtk, this.evStat.spAtk).hpOther(natureData.SpAtkBonus);
-        this.spDef = new StatCalculator(pokeData.BaseSpDef, this.level, this.ivStat.spDef, this.evStat.spDef).hpOther(natureData.SpDefBonus);
-        this.speed = new StatCalculator(pokeData.BaseSpeed, this.level, this.ivStat.speed, this.evStat.speed).hpOther(natureData.SpeedBonus);
+        const hp = new PokemonEachStatCalculator(pokeData.BaseHP, this.level, this.ivStat.hp, this.evStat.hp).hp();
+        this.stat.maxHP = hp;
+        this.stat.currentHP = hp;
+        this.stat.atk = new PokemonEachStatCalculator(pokeData.BaseAtk, this.level, this.ivStat.atk, this.evStat.atk).hpOther(natureData.AtkBonus);
+        this.stat.def = new PokemonEachStatCalculator(pokeData.BaseDef, this.level, this.ivStat.def, this.evStat.def).hpOther(natureData.DefBonus);
+        this.stat.spAtk = new PokemonEachStatCalculator(pokeData.BaseSpAtk, this.level, this.ivStat.spAtk, this.evStat.spAtk).hpOther(natureData.SpAtkBonus);
+        this.stat.spDef = new PokemonEachStatCalculator(pokeData.BaseSpDef, this.level, this.ivStat.spDef, this.evStat.spDef).hpOther(natureData.SpDefBonus);
+        this.stat.speed = new PokemonEachStatCalculator(pokeData.BaseSpeed, this.level, this.ivStat.speed, this.evStat.speed).hpOther(natureData.SpeedBonus);
     }
+
+    getStatText() {
+        let text = "";
+        text += "(HP：" + this.stat.maxHP + ")";
+        text += " (攻撃：" + this.stat.atk + ")";
+        text += " (防御：" + this.stat.def + ")";
+        text += " (特攻：" + this.stat.spAtk + ")";
+        text += " (特防：" + this.stat.spDef + ")";
+        text += " (素早さ：" + this.stat.speed + ")";
+        return text;
+    }
+
 }
 
 function objectToPokemon(obj) {
     const pokemon = new Pokemon();
     pokemon.name = obj.name;
     pokemon.level = obj.level;
+
     pokemon.nature = obj.nature;
+    pokemon.ability = obj.ability;
+    pokemon.item = obj.item;
+
     pokemon.moveNames = obj.moveNames;
     pokemon.pointUps = obj.pointUps;
     pokemon.moveset = obj.moveset;
+
     pokemon.ivStat = obj.ivStat;
     pokemon.evStat = obj.evStat;
-    pokemon.maxHP = obj.maxHP;
-    pokemon.currentHP = obj.currentHP;
-    pokemon.atk = obj.akt;
-    pokemon.def = obj.def;
-    pokemon.spAtk = obj.spAtk;
-    pokemon.spDef = obj.spDef;
-    pokemon.speed = obj.speed;
+    pokemon.stat = obj.stat;
     return pokemon;
 }
 
-class StatCalculator {
-    constructor(base, level, iv, ev) {
-        this.base = base;
+class PokemonEachStatCalculator {
+    constructor(base, level, individual, effort) {
+        this.baseStat = base;
         this.level = level;
-        this.iv = iv;
-        this.ev = ev;
+        this.individual = individual;
+        this.effort = effort;
     }
 
     hp() {
-        const evBonus = Math.floor(this.ev/EFFECT_EV);
-        return Math.floor(((this.base*2 + this.iv + evBonus) * this.level / 100)) + this.level + 10;
+        const evBonus = Math.floor(this.effort/EFFECT_EV);
+        return Math.floor(((this.baseStat*2 + this.individual + evBonus) * this.level / 100)) + this.level + 10;
     }
 
-    hpOther(bonus) {
-        const evBonus = Math.floor(this.ev/4);
-        const stat = (this.base*2 + this.iv + evBonus) * this.level/100 + 5;
-        return parseInt(stat * bonus, 10);
+    hpOther(natureBonus) {
+        const evBonus = Math.floor(this.effort/EFFECT_EV);
+        const stat = (this.baseStat*2 + this.individual + evBonus) * this.level/100 + 5;
+        return parseInt(stat * natureBonus, 10);
     }
+}
+
+function getPokemonImgPath(pokeName) {
+    return "data/fourth-generation/img/" + pokeName + ".gif";
 }

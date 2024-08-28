@@ -1,19 +1,3 @@
-const POKEMON_ANCHOR_IDS = [
-    "self-pokemon1-a",
-    "self-pokemon2-a",
-    "self-pokemon3-a",
-    "self-pokemon4-a",
-    "self-pokemon5-a",
-    "self-pokemon6-a",
-
-    "opponent-pokemon1-a",
-    "opponent-pokemon2-a",
-    "opponent-pokemon3-a",
-    "opponent-pokemon4-a",
-    "opponent-pokemon5-a",
-    "opponent-pokemon6-a",
-];
-
 const BATTLE_START_BUTTON_ID = "battle-start-button";
 
 function setBothTeamPokemonImg(bothTeam, pokemonAnchors) {
@@ -23,16 +7,14 @@ function setBothTeamPokemonImg(bothTeam, pokemonAnchors) {
         pokemonAnchors[i].href = url.toString();
         const img = document.createElement("img");
         img.id = i;
-        img.src = "img/" + pokemon.name + ".gif";
+        img.src = getPokemonImgPath(pokemon.name);
+        //aタグの中に画像を追加
         pokemonAnchors[i].appendChild(img);
     });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const POKEMON_ANCHORS = POKEMON_ANCHOR_IDS.map(pokemonAnchorId => {
-        return document.getElementById(pokemonAnchorId);
-    });
-
+    const POKEMON_ANCHORS = document.getElementsByClassName("pokemon-a")
     const BATTLE_START_BUTTON = document.getElementById(BATTLE_START_BUTTON_ID);
     initPokemonSessionStorageSetter
         .then(() => {
@@ -42,20 +24,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 const bothTeam = PokemonSessionStorage.getBothTeam();
                 const selfTeam = bothTeam.slice(0, MAX_TEAM_NUM-3);
                 const opponentTeam = bothTeam.slice(MAX_TEAM_NUM, MAX_BOTH_TEAM_NUM-3);
-                fetch(makeCaitlinFullURL(selfTeam, opponentTeam, null))
+                fetch(makeCaitlinFullURL(selfTeam, opponentTeam))
                     .then(response => {
                         return response.json();
                     })
                     .then((json) => {
                         const battle = JSON.parse(JSON.stringify(json));
-                        sessionStorage.setItem("selfFighters", JSON.stringify(battle.SelfFighters));
-                        sessionStorage.setItem("opponentFighters", JSON.stringify(battle.OpponentFighters));
+                        sessionStorage.setItem("battle", JSON.stringify(battle));
                         location.href = "vs-caitlin.html";
                     })
             });
         })
         .catch(err => {
-            alert("dawn.exeファイルが実行されていないかもしれません。");
+            //alert("dawn.exeファイルが実行されていないかもしれません。");
             console.error(err);
         });
 
@@ -82,7 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const targetSrc = event.target.src;
                     const targetIndex = parseInt(event.target.id, 10);
-
                     const draggedSrc = draggedImg.src;
                     const draggedIndex = parseInt(draggedImg.id, 10);
 
@@ -93,6 +73,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     PokemonSessionStorage.set(targetPokemon, draggedIndex);
                     PokemonSessionStorage.set(dragendPokemon, targetIndex);
-                })
+
+                    const bothTeam = PokemonSessionStorage.getBothTeam()
+                    bothTeam.map((pokemon, i) => {
+                        const url = new URL(POKEMON_ANCHORS[i]);
+                        url.searchParams.set("poke_name", pokemon.name);
+                        POKEMON_ANCHORS[i].href = url.toString();
+                    });
+                });
             });
 });

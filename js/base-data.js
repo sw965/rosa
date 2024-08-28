@@ -2,6 +2,7 @@ let ALL_POKE_NAMES;
 const allPokeNamesLoader =
 fetch(makeDawnFullURL("all_poke_names"))
     .then(response => {
+        console.log("ここ")
         return response.json();
     })
     .then(json => {
@@ -66,6 +67,6 @@ const naturedexLoader =
 
 const baseDataLoader = Promise.all([allPokeNamesLoader, pokedexLoader, movedexLoader, allNaturesLoader, naturedexLoader])
     .catch(err => {
-        alert("dawn.exeファイルが実行されていないかもしれません。");
+        //alert("dawn.exeファイルが実行されていないかもしれません。");
         console.error(err);
     });

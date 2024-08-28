@@ -11,10 +11,15 @@ function pokemonImgSrcToPokeName(src) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log(sessionStorage.getItem("selfFighters"));
+    console.log(sessionStorage.getItem("opponentFighters"));
     const bothTeam = PokemonSessionStorage.getBothTeam();
 
-    const SELF_LEAD_POKEMON_IMG = document.getElementById("self-lead-pokemon-img");
-    SELF_LEAD_POKEMON_IMG.src = "img/" + bothTeam[0].name + ".gif";
+    const SELF_POKEMON_IMGS = [0, 1, 2].map(i => {
+        const selfPokemonImg = document.getElementById("self-pokemon" + i + "-img");
+        console.log("getItem", JSON.parse(sessionStorage.getItem("battle")));
+        selfPokemonImg.src = "img/" + JSON.parse(sessionStorage.getItem("selfFighters"))[i].Name + ".gif";
+    });
 
     const OPPONENT_LEAD_POKEMON_IMG = document.getElementById("opponent-lead-pokemon-img");
     OPPONENT_LEAD_POKEMON_IMG.src = "img/" + bothTeam[MAX_TEAM_NUM].name + ".gif";
@@ -29,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const SELF_CURRENT_HP = document.getElementById("self-current-hp");
     const OPPONENT_CURRENT_HP = document.getElementById("opponent-current-hp");
+    const MESSAGE_H = document.getElementById("message-h3");
 
     async function update(uis) {
         let i = 0;
@@ -47,10 +53,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     SELF_CURRENT_HP.innerText = ui.RealSelfCurrentHP;
                     OPPONENT_CURRENT_HP.innerText = ui.RealOpponentCurrentHP;
+
+                    if (ui.Message !== MESSAGE_H.innerText) {
+                        MESSAGE_H.innerText = ui.Message;
+                    }
                     resolve();
-                    console.log("解決");
-                }, 100);
-                console.log("i=", i);
+                }, 50);
                 i += 1;
             });
         }
@@ -58,15 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     MOVE_BUTTONS.map((moveButton, i) => {
         moveButton.addEventListener("click", (event) => {
-            console.log(event.target.value);
-            fetch(makeCaitlinFullURL(null, null, event.target.value))
-                .then(response => {
-                    return response.json();
-                })
-                .then(json => {
-                    const uis = JSON.parse(JSON.stringify(json));
-                    update(uis);
-                });
-        });
+            console.log("押された！")
+        })
     });
 });

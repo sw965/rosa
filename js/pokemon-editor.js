@@ -162,27 +162,12 @@ function updateSumEVInnerText(evInputs, sumEVHeading) {
     sumEVHeading.innerText = getSumEVText(getSumEV(evInputs));
 }
 
-function getStatText(hp, atk, def, spAtk, spDef, speed) {
-    let text = "";
-    text += "(HP：" + hp + ")";
-    text += " (攻撃：" + atk + ")";
-    text += " (防御：" + def + ")";
-    text += " (特攻：" + spAtk + ")";
-    text += " (特防：" + spDef + ")";
-    text += " (素早さ：" + speed + ")";
-    return text;
-}
-
-function updateStatInnerText(statHeading, pokemon) {
-    statHeading.innerText = getStatText(pokemon.maxHP, pokemon.atk, pokemon.def, pokemon.spAtk, pokemon.spDef, pokemon.speed);
+function updatePokemonStatInnerText(statHeading, pokemon) {
+    statHeading.innerText = pokemon.getStatText()
 }
 
 const POKEMON_IMG_ID = "pokemon-img";
 const FILE_SAVE_BUTTON_ID = "file-save-button";
-
-function getPokemonImgPath(pokeName) {
-    return "img/" + pokeName + ".gif";
-}
 
 document.addEventListener("DOMContentLoaded", () => {
     const POKEMON_SELECT = document.getElementById("pokemon-select");
@@ -190,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     POKEMON_SELECT.addEventListener("change", () => {
         const pokeName = POKEMON_SELECT.value
         switchLearnset(pokeName, MOVE_SELECTS);
-        updateStatInnerText(STAT_HEADING, makePokemon());
+        updatePokemonStatInnerText(STAT_HEADING, makePokemon());
         POKEMON_IMG.src = getPokemonImgPath(pokeName);
     });
 
@@ -210,30 +195,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     LEVEL_INPUT.addEventListener("input", () => {
-        updateStatInnerText(STAT_HEADING, makePokemon());
+        updatePokemonStatInnerText(STAT_HEADING, makePokemon());
     });
 
     const MAX_LEVEL_BUTTON = document.getElementById("max-level-button");
     MAX_LEVEL_BUTTON.addEventListener("click", ()=> {
         LEVEL_INPUT.value = MAX_LEVEL;
-        updateStatInnerText(STAT_HEADING, makePokemon());
+        updatePokemonStatInnerText(STAT_HEADING, makePokemon());
     });
 
     const STANDARD_LEVEL_BUTTON = document.getElementById("standard-level-button");
     STANDARD_LEVEL_BUTTON.addEventListener("click", () => {
         LEVEL_INPUT.value = STANDARD_LEVEL;
-        updateStatInnerText(STAT_HEADING, makePokemon());
+        updatePokemonStatInnerText(STAT_HEADING, makePokemon());
     })
 
     const MIN_LEVEL_BUTTON = document.getElementById("min-level-button");
     MIN_LEVEL_BUTTON.addEventListener("click", () => {
         LEVEL_INPUT.value = MIN_LEVEL;
-        updateStatInnerText(STAT_HEADING, makePokemon());
+        updatePokemonStatInnerText(STAT_HEADING, makePokemon());
     });
 
     const NATURE_SELECT = document.getElementById("nature-select");
     NATURE_SELECT.addEventListener("change", () => {
-        updateStatInnerText(STAT_HEADING, makePokemon());
+        updatePokemonStatInnerText(STAT_HEADING, makePokemon());
     })
 
     const MOVE_SELECTS = MOVE_SELECT_IDS.map(moveSelectId => {
@@ -339,17 +324,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 ivInput.addEventListener("input", () => {
-                    updateStatInnerText(STAT_HEADING, makePokemon());
+                    updatePokemonStatInnerText(STAT_HEADING, makePokemon());
                 });
 
                 MAX_IV_BUTTONS[i].addEventListener("click", () => {
                     ivInput.value = MAX_IV;
-                    updateStatInnerText(STAT_HEADING, makePokemon());
+                    updatePokemonStatInnerText(STAT_HEADING, makePokemon());
                 });
         
                 MIN_IV_BUTTONS[i].addEventListener("click", () => {
                     ivInput.value = MIN_IV;
-                    updateStatInnerText(STAT_HEADING, makePokemon());
+                    updatePokemonStatInnerText(STAT_HEADING, makePokemon());
                 });
             });
         });
@@ -398,7 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);
                     }
-                    updateStatInnerText(STAT_HEADING, makePokemon());
+                    updatePokemonStatInnerText(STAT_HEADING, makePokemon());
                 });
         
                 MAX_EV_BUTTONS[i].addEventListener("click", () => {
@@ -408,20 +393,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         evInput.value = Math.floor(remainingEV / EFFECT_EV) * EFFECT_EV;
                     }
-                    updateStatInnerText(STAT_HEADING, makePokemon());
+                    updatePokemonStatInnerText(STAT_HEADING, makePokemon());
+                    updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);     
                 });
         
                 MIN_EV_BUTTONS[i].addEventListener("click", () => {
                     evInput.value = MIN_EV;
-                    updateStatInnerText(STAT_HEADING, makePokemon());
+                    updatePokemonStatInnerText(STAT_HEADING, makePokemon());
                     updateSumEVInnerText(EV_INPUTS, SUM_EV_HEADING);         
                 });
             });
         })
         .then(() => {
             SUM_EV_HEADING.innerText = getSumEVText(getSumEV(EV_INPUTS));
-            console.log(makePokemon());
-            updateStatInnerText(STAT_HEADING, makePokemon());
+            updatePokemonStatInnerText(STAT_HEADING, makePokemon());
         });
 
     function makePokemon() {
@@ -430,10 +415,13 @@ document.addEventListener("DOMContentLoaded", () => {
             MOVE_SELECTS[2].value, MOVE_SELECTS[3].value,
         ]
 
-        const pointUps = [
-            POINT_UP_SELECTS[0].value, POINT_UP_SELECTS[1].value,
-            POINT_UP_SELECTS[2].value, POINT_UP_SELECTS[3].value,
-        ]
+        const pointUps = POINT_UP_SELECTS.map((pointUpSelect, i) => {
+            if (pointUpSelect.value == "") {
+                return -1;
+            } else {
+                return parseInt(pointUpSelect.value, 10);
+            }
+        })
 
         const ivStat = {
             hp:parseInt(IV_INPUTS[0].value, 10),

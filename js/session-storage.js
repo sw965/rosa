@@ -9,11 +9,11 @@ class PokemonSessionStorage {
 
     static get(teamIndex) {
         const key = PokemonSessionStorage.keys[teamIndex];
-        const item = sessionStorage.getItem(key);
-        if (item === null) {
+        const pokemonStr = sessionStorage.getItem(key);
+        if (pokemonStr === null) {
             return new Pokemon();
         } else {
-            return objectToPokemon(JSON.parse(item));
+            return objectToPokemon(JSON.parse(pokemonStr));
         }
     }
 
@@ -24,7 +24,7 @@ class PokemonSessionStorage {
 
     static getBothTeam() {
         const bothTeam = [];
-        for (let i =0; i < MAX_BOTH_TEAM_NUM; i++) {
+        for (let i = 0; i < MAX_BOTH_TEAM_NUM; i++) {
             bothTeam.push(PokemonSessionStorage.get(i));
         }
         return bothTeam;
