@@ -1,17 +1,18 @@
-const DAWN_BASE_URL = "http://localhost:8081/dawn/";
+const DATA_BASE_URL = "http://localhost:8080/data/";
 
-function makeDawnFullURL(dataType) {
-    const url = new URL(DAWN_BASE_URL);
+
+function makeDataServerFullURL(dataType) {
+    const url = new URL(DATA_BASE_URL);
     url.searchParams.append("data_type", encodeURIComponent(dataType));
     return url.toString();
 }
 
-const CAITLIN_BASE_URL = "http://localhost:8080/caitlin/";
+const BATTLE_BASE_URL = "http://localhost:8080/battle/";
 
-function makeCaitlinFullURL(selfTeam, opponentTeam) {
-    const url = new URL(CAITLIN_BASE_URL);
-    alert(JSON.stringify(selfTeam));
-    url.searchParams.append("selfTeam", encodeURIComponent(JSON.stringify(selfTeam)));
-    url.searchParams.append("opponentTeam", encodeURIComponent(JSON.stringify(opponentTeam)));
+function makeBattleManagerFullURL(battleType, playerPokemons, caitlinPokemons) {
+    const url = new URL(BATTLE_BASE_URL);
+    url.searchParams.append("battle_type", encodeURIComponent(battleType));
+    url.searchParams.append("player_pokemons", encodeURIComponent(JSON.stringify(playerPokemons)));
+    url.searchParams.append("caitlin_pokemons", encodeURIComponent(JSON.stringify(caitlinPokemons)));
     return url.toString();
 }

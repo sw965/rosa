@@ -1,7 +1,7 @@
 const BATTLE_START_BUTTON_ID = "battle-start-button";
 
-function setBothTeamPokemonImg(bothTeam, pokemonAnchors) {
-    bothTeam.map((pokemon, i) => {
+function setBothPokemonsImg(bothPokemons, pokemonAnchors) {
+    bothPokemons.map((pokemon, i) => {
         const url = new URL(pokemonAnchors[i]);
         url.searchParams.append("poke_name", pokemon.name);
         pokemonAnchors[i].href = url.toString();
@@ -18,19 +18,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const BATTLE_START_BUTTON = document.getElementById(BATTLE_START_BUTTON_ID);
     initPokemonSessionStorageSetter
         .then(() => {
-            const bothTeam = PokemonSessionStorage.getBothTeam();
-            setBothTeamPokemonImg(bothTeam, POKEMON_ANCHORS);
+            const bothPokemons =  PokemonSessionStorage.getPlayerPokemons().concat(PokemonSessionStorage.getCaitlinPokemons());
+            setBothPokemonsImg(bothPokemons, POKEMON_ANCHORS);
             BATTLE_START_BUTTON.addEventListener("click", () => {
-                const bothTeam = PokemonSessionStorage.getBothTeam();
-                const selfTeam = bothTeam.slice(0, MAX_TEAM_NUM-3);
-                const opponentTeam = bothTeam.slice(MAX_TEAM_NUM, MAX_BOTH_TEAM_NUM-3);
-                fetch(makeCaitlinFullURL(selfTeam, opponentTeam))
+                const playerPokemons = PokemonSessionStorage.getPlayerPokemons();
+                const caitlinPokemons = PokemonSessionStorage.getCaitlinPokemons();
+                fetch(makeBattleManagerFullURL("single", playerPokemons, caitlinPokemons))
                     .then(response => {
                         return response.json();
                     })
                     .then((json) => {
-                        const battle = JSON.parse(JSON.stringify(json));
-                        sessionStorage.setItem("battle", JSON.stringify(battle));
+                        sessionStorage.setItem("player_pokemons", JSON.stringify(playerPokemons));
+                        sessionStorage.setItem("caitlin_pokemons", JSON.stringify(caitlinPokemons));
                         location.href = "vs-caitlin.html";
                     })
             });
@@ -74,8 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     PokemonSessionStorage.set(targetPokemon, draggedIndex);
                     PokemonSessionStorage.set(dragendPokemon, targetIndex);
 
-                    const bothTeam = PokemonSessionStorage.getBothTeam()
-                    bothTeam.map((pokemon, i) => {
+                    const bothPokemons =  PokemonSessionStorage.getPlayerPokemons().concat(PokemonSessionStorage.getCaitlinPokemons());
+                    bothPokemons.map((pokemon, i) => {
                         const url = new URL(POKEMON_ANCHORS[i]);
                         url.searchParams.set("poke_name", pokemon.name);
                         POKEMON_ANCHORS[i].href = url.toString();

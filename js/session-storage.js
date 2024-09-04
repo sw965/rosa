@@ -1,10 +1,10 @@
 class PokemonSessionStorage {
     static keys = [
-        "selfPokemon1", "selfPokemon2", "selfPokemon3",
-        "selfPokemon4", "selfPokemon5", "selfPokemon6",
+        "playerPokemon1", "playerPokemon2", "playerPokemon3",
+        "playerPokemon4", "playerPokemon5", "playerPokemon6",
 
-        "opponentPokemon1", "opponentPokemon2", "opponentPokemon3",
-        "opponentPokemon4", "opponentPokemon5", "opponentPokemon6",
+        "caitlinPokemon1", "caitlinPokemon2", "caitlinPokemon3",
+        "caitlinPokemon4", "caitlinPokemon5", "caitlinPokemon6",
     ]
 
     static get(teamIndex) {
@@ -22,12 +22,20 @@ class PokemonSessionStorage {
         sessionStorage.setItem(key, JSON.stringify(pokemon));
     }
 
-    static getBothTeam() {
-        const bothTeam = [];
-        for (let i = 0; i < MAX_BOTH_TEAM_NUM; i++) {
-            bothTeam.push(PokemonSessionStorage.get(i));
+    static getPlayerPokemons() {
+        const pokemons = []
+        for (let i = 0; i < MAX_TEAM_NUM; i++) {
+            pokemons.push(PokemonSessionStorage.get(i));
         }
-        return bothTeam;
+        return pokemons;
+    }
+
+    static getCaitlinPokemons() {
+        const pokemons = []
+        for (let i = 0; i < MAX_TEAM_NUM; i++) {
+            pokemons.push(PokemonSessionStorage.get(i + MAX_TEAM_NUM));
+        }
+        return pokemons;
     }
 }
 
@@ -63,52 +71,52 @@ const initPokemonSessionStorageSetter = baseDataLoader
                 pokemon.updateMoveset();
             }
 
-            if (pokemon.ivStat.hp === null) {
-                pokemon.ivStat.hp = MAX_IV;
+            if (pokemon.individualStat.hp === null) {
+                pokemon.individualStat.hp = MAX_IV;
             }
     
-            if (pokemon.ivStat.atk === null) {
-                pokemon.ivStat.atk = MAX_IV;
+            if (pokemon.individualStat.atk === null) {
+                pokemon.individualStat.atk = MAX_IV;
             }
     
-            if (pokemon.ivStat.def === null) {
-                pokemon.ivStat.def = MAX_IV;
+            if (pokemon.individualStat.def === null) {
+                pokemon.individualStat.def = MAX_IV;
             }
     
-            if (pokemon.ivStat.spAtk === null) {
-                pokemon.ivStat.spAtk = MAX_IV;
+            if (pokemon.individualStat.spAtk === null) {
+                pokemon.individualStat.spAtk = MAX_IV;
             }
     
-            if (pokemon.ivStat.spDef === null) {
-                pokemon.ivStat.spDef = MAX_IV;
+            if (pokemon.individualStat.spDef === null) {
+                pokemon.individualStat.spDef = MAX_IV;
             }
     
-            if (pokemon.ivStat.speed === null) {
-                pokemon.ivStat.speed = MAX_IV;
+            if (pokemon.individualStat.speed === null) {
+                pokemon.individualStat.speed = MAX_IV;
             }
     
-            if (pokemon.evStat.hp === null) {
-                pokemon.evStat.hp = MIN_EV;
+            if (pokemon.effortStat.hp === null) {
+                pokemon.effortStat.hp = MIN_EV;
             }
     
-            if (pokemon.evStat.atk === null) {
-                pokemon.evStat.atk = MIN_EV;
+            if (pokemon.effortStat.atk === null) {
+                pokemon.effortStat.atk = MIN_EV;
             }
     
-            if (pokemon.evStat.def === null) {
-                pokemon.evStat.def = MIN_EV;
+            if (pokemon.effortStat.def === null) {
+                pokemon.effortStat.def = MIN_EV;
             }
     
-            if (pokemon.evStat.spAtk === null) {
-                pokemon.evStat.spAtk = MIN_EV;
+            if (pokemon.effortStat.spAtk === null) {
+                pokemon.effortStat.spAtk = MIN_EV;
             }
     
-            if (pokemon.evStat.spDef === null) {
-                pokemon.evStat.spDef = MIN_EV;
+            if (pokemon.effortStat.spDef === null) {
+                pokemon.effortStat.spDef = MIN_EV;
             }
     
-            if (pokemon.evStat.speed === null) {
-                pokemon.evStat.speed = MIN_EV;
+            if (pokemon.effortStat.speed === null) {
+                pokemon.effortStat.speed = MIN_EV;
             }
             
             pokemon.updateStat();

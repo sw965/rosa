@@ -306,7 +306,7 @@ document.addEventListener("DOMContentLoaded", () => {
             IV_INPUTS.map((ivInput, i) => {
                 ivInput.min = MIN_IV;
                 ivInput.max = MAX_IV;
-                const initIV = INIT_POKEMON.getIVArray()[i];
+                const initIV = INIT_POKEMON.getIndividuals()[i];
                 if (initIV !== null) {
                     ivInput.value = initIV;
                 } else {
@@ -360,7 +360,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 evInput.min = MIN_EV;
                 evInput.max = MAX_EV;
         
-                const initEV = INIT_POKEMON.getEVArray()[i];
+                const initEV = INIT_POKEMON.getEfforts()[i];
                 if (initEV !== null) {
                     evInput.value = initEV;
                 } else {
@@ -423,7 +423,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
 
-        const ivStat = {
+        const individualStat = {
             hp:parseInt(IV_INPUTS[0].value, 10),
             atk:parseInt(IV_INPUTS[1].value, 10),
             def:parseInt(IV_INPUTS[2].value, 10),
@@ -432,7 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
             speed:parseInt(IV_INPUTS[5].value, 10),
         };
 
-        const evStat = {
+        const effortStat = {
             hp:parseInt(EV_INPUTS[0].value, 10),
             atk:parseInt(EV_INPUTS[1].value, 10),
             def:parseInt(EV_INPUTS[2].value, 10),
@@ -448,8 +448,8 @@ document.addEventListener("DOMContentLoaded", () => {
         pokemon.moveNames = moveNames;
         pokemon.pointUps = pointUps;
         pokemon.updateMoveset();
-        pokemon.ivStat = ivStat;
-        pokemon.evStat = evStat;
+        pokemon.individualStat = individualStat;
+        pokemon.effortStat = effortStat;
         pokemon.updateStat();
         return pokemon;
     }
@@ -492,12 +492,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 POINT_UP_INPUTS[i].value = pointUp;
             });
 
-            const ivArray = pokemon.getIVArray();
+            const ivArray = pokemon.getIndividuals();
             IV_INPUTS.map((ivInput, i) => {
                 ivInput.value = ivArray[i];
             });
 
-            const evArray = pokemon.getEVArray();
+            const evArray = pokemon.getEfforts();
             EV_INPUTS.map((evInput, i) => {
                 evInput.value = evArray[i];                
             })
