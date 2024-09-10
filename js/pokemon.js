@@ -42,17 +42,20 @@ class Pokemon {
         //ここからは、バトル中に動的に変わる属性
         this.types =  null;
         this.statusAilment = null;
-        this.rankStat = null;
+        this.rankStat = {
+            atk:null,
+            def:null,
+            spAtk:null,
+            spDef:null,
+            speed:null,
+        };
     
-        this.isFlinchState = false;
-        this.remainingTurnTauntState = 0;
-        this.isProtectState = false;
-        this.protectConsecutiveSuccess = 0;
-        this.substituteHP = 0;
-    
-        //場に出てから経過したターンをカウントする。ねこだましなどに使う。
-        this.turnCount = 0;
-        this.thisTurnPlannedUseMoveName = null;
+        this.isFlinchState = null;
+        this.remainingTurnTauntState = null;
+        this.isProtectState = null;
+        this.protectConsecutiveSuccess = null;
+        this.substituteHP = null;
+        this.turnCount = null;
     }
     
     updateMoveset() {
@@ -137,6 +140,22 @@ class Pokemon {
         return text;
     }
 
+    initBattleAttribute() {
+        this.types = POKEDEX[this.name].Types;
+        this.statusAilment = "";
+        this.rankStat.atk = 0;
+        this.rankStat.def = 0;
+        this.rankStat.spAtk = 0;
+        this.rankStat.spDef = 0;
+        this.rankStat.speed = 0;
+
+        this.isFlinchState = false;
+        this.remainingTurnTauntState = 0;
+        this.isProtectState = false;
+        this.protectConsecutiveSuccess = 0;
+        this.substituteHP = 0;
+        this.turnCount = 0;
+    }
 }
 
 //属性が足りてない

@@ -1,6 +1,6 @@
 let ALL_POKE_NAMES;
 const allPokeNamesLoader =
-fetch(makeDataServerFullURL("all_poke_names"))
+fetch(makeDataQueryServerFullURL("all_poke_names"))
     .then(response => {
         return response.json();
     })
@@ -13,7 +13,7 @@ fetch(makeDataServerFullURL("all_poke_names"))
 
 let POKEDEX;
 const pokedexLoader =
-    fetch(makeDataServerFullURL("pokedex"))
+    fetch(makeDataQueryServerFullURL("pokedex"))
         .then(response => {
             return response.json();
         })
@@ -26,7 +26,7 @@ const pokedexLoader =
 
 let MOVEDEX;
 const movedexLoader =
-    fetch(makeDataServerFullURL("movedex"))
+    fetch(makeDataQueryServerFullURL("movedex"))
         .then(response => {
             return response.json();
         })
@@ -40,7 +40,7 @@ const movedexLoader =
 
 let ALL_NATURES;
 const allNaturesLoader =
-    fetch(makeDataServerFullURL("all_natures"))
+    fetch(makeDataQueryServerFullURL("all_natures"))
         .then(response => {
             return response.json();
         })
@@ -53,7 +53,7 @@ const allNaturesLoader =
 
 let NATUREDEX;
 const naturedexLoader =
-    fetch(makeDataServerFullURL("naturedex"))
+    fetch(makeDataQueryServerFullURL("naturedex"))
         .then(response => {
             return response.json()
         })

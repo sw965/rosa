@@ -3,8 +3,8 @@ class PokemonSessionStorage {
         "playerPokemon1", "playerPokemon2", "playerPokemon3",
         "playerPokemon4", "playerPokemon5", "playerPokemon6",
 
-        "caitlinPokemon1", "caitlinPokemon2", "caitlinPokemon3",
-        "caitlinPokemon4", "caitlinPokemon5", "caitlinPokemon6",
+        "aiPokemon1", "aiPokemon2", "aiPokemon3",
+        "aiPokemon4", "aiPokemon5", "aiPokemon6",
     ]
 
     static get(teamIndex) {
@@ -30,7 +30,7 @@ class PokemonSessionStorage {
         return pokemons;
     }
 
-    static getCaitlinPokemons() {
+    static getAIPokemons() {
         const pokemons = []
         for (let i = 0; i < MAX_TEAM_NUM; i++) {
             pokemons.push(PokemonSessionStorage.get(i + MAX_TEAM_NUM));
@@ -118,7 +118,7 @@ const initPokemonSessionStorageSetter = baseDataLoader
             if (pokemon.effortStat.speed === null) {
                 pokemon.effortStat.speed = MIN_EV;
             }
-            
+
             pokemon.updateStat();
             PokemonSessionStorage.set(pokemon, i);
         });
