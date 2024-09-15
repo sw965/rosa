@@ -1,32 +1,61 @@
 const BATTLE_START_BUTTON_ID = "battle-start-button";
 
-function setBothPokemonsImg(bothPokemons, pokemonAnchors) {
-    bothPokemons.map((pokemon, i) => {
-        const url = new URL(pokemonAnchors[i]);
-        url.searchParams.append("poke_name", pokemon.name);
-        pokemonAnchors[i].href = url.toString();
-        const img = document.createElement("img");
-        img.id = i;
-        img.src = getPokemonImgPath(pokemon.name);
-        //aタグの中に画像を追加
-        pokemonAnchors[i].appendChild(img);
-    });
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-    const POKEMON_ANCHORS = document.getElementsByClassName("pokemon-a")
-    const BATTLE_START_BUTTON = document.getElementById(BATTLE_START_BUTTON_ID);
-    initPokemonSessionStorageSetter
+    const PLAYER_TEAM_ANCHORS = document.getElementsByClassName("player-pokemon-editor-link");
+    const AI_TEAM_ANCHORS = document.getElementsByClassName("ai-pokemon-editor-link");
+    const PLAYER_AND_AI_TEAM_ANCHORS = Array.from(PLAYER_TEAM_ANCHORS).concat(Array.from(AI_TEAM_ANCHORS));
+
+    function updateImgs() {
+        TeamSessionStorage.getPlayerAndAITeam().map((pokemon, i) => {
+            const img = document.createElement("img");
+            img.dataset.index = i;
+            img.src = getPokemonImgPath(pokemon.name);
+            const anchor = PLAYER_AND_AI_TEAM_ANCHORS[i];
+            //aタグの中の中の全ての要素を消す。
+            while (anchor.firstChild) {
+                anchor.removeChild(anchor.firstChild);
+            }
+            //aタグの中に画像を追加。
+            anchor.appendChild(img);
+        });
+    };
+
+    function updateHrefs() {
+        TeamSessionStorage.getPlayerAndAITeam().map((pokemon, i) => {
+            const anchor = PLAYER_AND_AI_TEAM_ANCHORS[i]; 
+            const url = new URL(anchor);
+            url.searchParams.set("poke_name", pokemon.name);
+            anchor.href = url.toString();
+        });
+    };
+
+    const START_BATTLE_BUTTON = document.getElementById("start-battle");
+
+    initTeamSessionStorageSetter
         .then(() => {
-            const bothPokemons =  PokemonSessionStorage.getPlayerPokemons().concat(PokemonSessionStorage.getAIPokemons());
-            setBothPokemonsImg(bothPokemons, POKEMON_ANCHORS);
-            BATTLE_START_BUTTON.addEventListener("click", () => {
-                const playerPokemons = PokemonSessionStorage.getPlayerPokemons();
-                const aiPokemons = PokemonSessionStorage.getAIPokemons();
-                const playerLeadPokemons = playerPokemons.slice(0, 2);
-                const playerBenchPokemons = playerPokemons.slice(2);
-                const aiLeadPokemons = aiPokemons.slice(0, 2);
-                const aiBenchPokemons = aiPokemons.slice(2);
+            updateHrefs();
+            updateImgs();
+
+            START_BATTLE_BUTTON.addEventListener("click", () => {
+                const playerTeam = TeamSessionStorage.getPlayerTeam();
+                const aiTeam = TeamSessionStorage.getAITeam();
+                const battleTypeRadio = document.querySelector('input[name="battle-type"]:checked');
+
+                let battleNum = 0;
+                if (battleTypeRadio.value === "シングルバトル") {
+                    battleNum = 1;
+                } else if (battleTypeRadio.value === "ダブルバトル") {
+                    battleNum = 2;
+                };
+
+                if (battleNum === 0) {
+                    alert("バトルの種類(シングルもしくはダブル)が指定されていない");
+                };
+
+                const playerLeadPokemons = playerTeam.slice(0, battleNum);
+                const playerBenchPokemons = playerTeam.slice(battleNum);
+                const aiLeadPokemons = aiTeam.slice(0, battleNum);
+                const aiBenchPokemons = aiTeam.slice(battleNum);
 
                 function initBattleAttribute(pokemons) {
                     pokemons.map((pokemon) => {
@@ -39,6 +68,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 initBattleAttribute(aiLeadPokemons);
                 initBattleAttribute(aiBenchPokemons);
 
+                function noneToEmpty(pokemons) {
+                    pokemons.map(pokemon => {
+                        pokemon.moveNames.map((moveName, i) => {
+                            if (moveName === NONE) {
+                                pokemon.moveNames[i] = ""
+                            }
+                        });
+    
+                        if (pokemon.item === NONE) {
+                            pokemon.item = ""
+                        };
+                    })
+                }
+
+                noneToEmpty(playerLeadPokemons);
+                noneToEmpty(playerBenchPokemons);
+                noneToEmpty(aiLeadPokemons);
+                noneToEmpty(aiBenchPokemons);
+
                 const url = new URL(BATTLE_INIT_SERVER_URL);
                 url.searchParams.append("ai_trainer_title", encodeURIComponent("四天王"));
                 url.searchParams.append("ai_trainer_name", encodeURIComponent("カトレア"));
@@ -46,25 +94,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 url.searchParams.append("player_bench_pokemons", encodeURIComponent(JSON.stringify(playerBenchPokemons)));
                 url.searchParams.append("ai_lead_pokemons", encodeURIComponent(JSON.stringify(aiLeadPokemons)));
                 url.searchParams.append("ai_bench_pokemons", encodeURIComponent(JSON.stringify(aiBenchPokemons)));
-                url.searchParams.append("init", encodeURIComponent("true"));
 
                 fetch(url.toString())
                     .then(response => {
                         return response.json();
                     })
-                    .then((responseBattle) => {
-                        sessionStorage.setItem("battle", JSON.stringify(responseBattle));
-                        location.href = "ai.html";
+                    .then((responseJson) => {
+                        if (responseJson === "ok") {
+                            location.href = "ai.html";
+                        } else {
+                            alert("バトルの初期化に失敗しました。");
+                        }
                     })
             });
         })
-        .catch(err => {
-            //alert("dawn.exeファイルが実行されていないかもしれません。");
-            console.error(err);
-        });
 
         let draggedImg;
-        initPokemonSessionStorageSetter
+        initTeamSessionStorageSetter
             .then(() => {
                 document.addEventListener("dragstart", (event) => {
                     draggedImg = event.target;
@@ -85,24 +131,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     const targetSrc = event.target.src;
-                    const targetIndex = parseInt(event.target.id, 10);
+                    const targetIndex = parseInt(event.target.dataset.index, 10);
                     const draggedSrc = draggedImg.src;
-                    const draggedIndex = parseInt(draggedImg.id, 10);
+                    const draggedIndex = parseInt(draggedImg.dataset.index, 10);
 
-                    const targetPokemon = PokemonSessionStorage.get(targetIndex);
-                    const dragendPokemon = PokemonSessionStorage.get(draggedIndex);
+                    const targetPokemon = TeamSessionStorage.get(targetIndex);
+                    const dragendPokemon = TeamSessionStorage.get(draggedIndex);
                     event.target.src = draggedSrc;
                     draggedImg.src = targetSrc;
 
-                    PokemonSessionStorage.set(targetPokemon, draggedIndex);
-                    PokemonSessionStorage.set(dragendPokemon, targetIndex);
-
-                    const bothPokemons =  PokemonSessionStorage.getPlayerPokemons().concat(PokemonSessionStorage.getAIPokemons());
-                    bothPokemons.map((pokemon, i) => {
-                        const url = new URL(POKEMON_ANCHORS[i]);
-                        url.searchParams.set("poke_name", pokemon.name);
-                        POKEMON_ANCHORS[i].href = url.toString();
-                    });
+                    TeamSessionStorage.set(targetPokemon, draggedIndex);
+                    TeamSessionStorage.set(dragendPokemon, targetIndex);
+                    updateHrefs();
                 });
             });
 });

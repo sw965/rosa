@@ -2,7 +2,7 @@ const DATA_QUERY_SERVER_URL = "http://localhost:8080/data_query/";
 
 function makeDataQueryServerFullURL(requestType) {
     const url = new URL(DATA_QUERY_SERVER_URL);
-    url.searchParams.append("request_type", encodeURIComponent(requestType));
+    url.searchParams.append("data_type", encodeURIComponent(requestType));
     return url.toString();
 }
 

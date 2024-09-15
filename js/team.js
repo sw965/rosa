@@ -1,4 +1,4 @@
-class PokemonSessionStorage {
+class TeamSessionStorage {
     static keys = [
         "playerPokemon1", "playerPokemon2", "playerPokemon3",
         "playerPokemon4", "playerPokemon5", "playerPokemon6",
@@ -7,8 +7,8 @@ class PokemonSessionStorage {
         "aiPokemon4", "aiPokemon5", "aiPokemon6",
     ]
 
-    static get(teamIndex) {
-        const key = PokemonSessionStorage.keys[teamIndex];
+    static get(idx) {
+        const key = TeamSessionStorage.keys[idx];
         const pokemonStr = sessionStorage.getItem(key);
         if (pokemonStr === null) {
             return new Pokemon();
@@ -17,36 +17,40 @@ class PokemonSessionStorage {
         }
     }
 
-    static set(pokemon, teamIndex) {
-        const key = PokemonSessionStorage.keys[teamIndex];
+    static set(pokemon, idx) {
+        const key = TeamSessionStorage.keys[idx];
         sessionStorage.setItem(key, JSON.stringify(pokemon));
     }
 
-    static getPlayerPokemons() {
-        const pokemons = []
+    static getPlayerTeam() {
+        const team = []
         for (let i = 0; i < MAX_TEAM_NUM; i++) {
-            pokemons.push(PokemonSessionStorage.get(i));
+            team.push(TeamSessionStorage.get(i));
         }
-        return pokemons;
+        return team;
     }
 
-    static getAIPokemons() {
-        const pokemons = []
+    static getAITeam() {
+        const team = []
         for (let i = 0; i < MAX_TEAM_NUM; i++) {
-            pokemons.push(PokemonSessionStorage.get(i + MAX_TEAM_NUM));
+            team.push(TeamSessionStorage.get(i + MAX_TEAM_NUM));
         }
-        return pokemons;
+        return team;
+    }
+
+    static getPlayerAndAITeam() {
+        return TeamSessionStorage.getPlayerTeam().concat(TeamSessionStorage.getAITeam());
     }
 }
 
-const initPokemonSessionStorageSetter = baseDataLoader
+const initTeamSessionStorageSetter = baseDataLoader
     .then(() => {
-        const bothTeamPokeNames = ALL_POKE_NAMES.slice(0, MAX_TEAM_NUM)
-            .concat(ALL_POKE_NAMES.slice(0, MAX_TEAM_NUM));
-
-        bothTeamPokeNames.map((pokeName, i) => {
+        const playerTeamPokeNames = ALL_POKE_NAMES.slice(0, MAX_TEAM_NUM);
+        const aiTeamPokeNames = ALL_POKE_NAMES.slice(0, MAX_TEAM_NUM);
+        playerTeamPokeNames.concat(aiTeamPokeNames).map((pokeName, i) => {
             const pokeData = POKEDEX[pokeName];
-            const pokemon = PokemonSessionStorage.get(i);
+            const pokemon = TeamSessionStorage.get(i);
+
             if (pokemon.name === null) {
                 pokemon.name = pokeName;
             }
@@ -58,9 +62,17 @@ const initPokemonSessionStorageSetter = baseDataLoader
             if (pokemon.nature === null) {
                 pokemon.nature = ALL_NATURES[0];
             }
-    
+
+            if (pokemon.ability === null) {
+                pokemon.ability = pokeData.Abilities[0];
+            }
+
+            if (pokemon.item === null) {
+                pokemon.item = NONE;
+            }
+
             if (pokemon.moveNames === null) {
-                pokemon.moveNames = [pokeData.Learnset[0], EMPTY, EMPTY, EMPTY];
+                pokemon.moveNames = [pokeData.Learnset[0], NONE, NONE, NONE];
             }
 
             if (pokemon.pointUps === null) {
@@ -72,54 +84,54 @@ const initPokemonSessionStorageSetter = baseDataLoader
             }
 
             if (pokemon.individualStat.hp === null) {
-                pokemon.individualStat.hp = MAX_IV;
+                pokemon.individualStat.hp = MAX_INDIVIDUAL;
             }
     
             if (pokemon.individualStat.atk === null) {
-                pokemon.individualStat.atk = MAX_IV;
+                pokemon.individualStat.atk = MAX_INDIVIDUAL;
             }
     
             if (pokemon.individualStat.def === null) {
-                pokemon.individualStat.def = MAX_IV;
+                pokemon.individualStat.def = MAX_INDIVIDUAL;
             }
     
             if (pokemon.individualStat.spAtk === null) {
-                pokemon.individualStat.spAtk = MAX_IV;
+                pokemon.individualStat.spAtk = MAX_INDIVIDUAL;
             }
     
             if (pokemon.individualStat.spDef === null) {
-                pokemon.individualStat.spDef = MAX_IV;
+                pokemon.individualStat.spDef = MAX_INDIVIDUAL;
             }
     
             if (pokemon.individualStat.speed === null) {
-                pokemon.individualStat.speed = MAX_IV;
+                pokemon.individualStat.speed = MAX_INDIVIDUAL;
             }
     
             if (pokemon.effortStat.hp === null) {
-                pokemon.effortStat.hp = MIN_EV;
+                pokemon.effortStat.hp = MIN_EFFORT;
             }
     
             if (pokemon.effortStat.atk === null) {
-                pokemon.effortStat.atk = MIN_EV;
+                pokemon.effortStat.atk = MIN_EFFORT;
             }
     
             if (pokemon.effortStat.def === null) {
-                pokemon.effortStat.def = MIN_EV;
+                pokemon.effortStat.def = MIN_EFFORT;
             }
     
             if (pokemon.effortStat.spAtk === null) {
-                pokemon.effortStat.spAtk = MIN_EV;
+                pokemon.effortStat.spAtk = MIN_EFFORT;
             }
     
             if (pokemon.effortStat.spDef === null) {
-                pokemon.effortStat.spDef = MIN_EV;
+                pokemon.effortStat.spDef = MIN_EFFORT;
             }
     
             if (pokemon.effortStat.speed === null) {
-                pokemon.effortStat.speed = MIN_EV;
+                pokemon.effortStat.speed = MIN_EFFORT;
             }
 
             pokemon.updateStat();
-            PokemonSessionStorage.set(pokemon, i);
+            TeamSessionStorage.set(pokemon, i);
         });
     });

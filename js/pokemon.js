@@ -56,12 +56,17 @@ class Pokemon {
         this.protectConsecutiveSuccess = null;
         this.substituteHP = null;
         this.turnCount = null;
+
+        /*
+            bippa(go言語)側のPokemon構造体には、下の属性もあるが、js側からは操作しない為、削除する。
+            this.thisTurnPlannedUseMoveName
+        */
     }
     
     updateMoveset() {
         const moveset = {};
         this.moveNames.filter(moveName => {
-            return moveName !== EMPTY;
+            return moveName !== NONE;
         }).map((moveName, i) => {
             const pointUp = this.pointUps[i];
             const moveData = MOVEDEX[moveName];
@@ -158,7 +163,6 @@ class Pokemon {
     }
 }
 
-//属性が足りてない
 function objectToPokemon(obj) {
     const pokemon = new Pokemon();
     pokemon.name = obj.name;
@@ -187,18 +191,13 @@ class PokemonEachStatCalculator {
     }
 
     hp() {
-        const evBonus = Math.floor(this.effort/EFFECT_EV);
+        const evBonus = Math.floor(this.effort/EFFECT_EFFORT);
         return Math.floor(((this.baseStat*2 + this.individual + evBonus) * this.level / 100)) + this.level + 10;
     }
 
     hpOther(natureBonus) {
-        const evBonus = Math.floor(this.effort/EFFECT_EV);
+        const evBonus = Math.floor(this.effort/EFFECT_EFFORT);
         const stat = (this.baseStat*2 + this.individual + evBonus) * this.level/100 + 5;
         return parseInt(stat * natureBonus, 10);
     }
-}
-
-//命名やグローバルが気になる
-function getPokemonImgPath(pokeName) {
-    return "data/fourth-generation/img/" + pokeName + ".gif";
 }

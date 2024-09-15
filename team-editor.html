@@ -6,9 +6,10 @@
     <script src="js/server-url.js"></script>
     <script src="js/base-data.js"></script>
     <script src="js/base-const.js"></script>
-    <script src="js/move-func.js"></script>
+    <script src="js/pp-func.js"></script>
     <script src="js/pokemon.js"></script>
-    <script src="js/session-storage.js"></script>
+    <script src="js/path.js"></script>
+    <script src="js/team.js"></script>
     <script src="js/team-editor.js"></script>
     <style>
         table {
@@ -28,23 +29,33 @@
 <body>
     <table>
         <tr>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=0"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=1"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=2"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=3"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=4"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=5"></a></td>
+            <td><a class="player-pokemon-editor-link" href="pokemon-editor.html?team_index=0"></a></td>
+            <td><a class="player-pokemon-editor-link" href="pokemon-editor.html?team_index=1"></a></td>
+            <td><a class="player-pokemon-editor-link" href="pokemon-editor.html?team_index=2"></a></td>
+            <td><a class="player-pokemon-editor-link" href="pokemon-editor.html?team_index=3"></a></td>
+            <td><a class="player-pokemon-editor-link" href="pokemon-editor.html?team_index=4"></a></td>
+            <td><a class="player-pokemon-editor-link" href="pokemon-editor.html?team_index=5"></a></td>
         </tr>
 
         <tr>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=6"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=7"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=8"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=9"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=10"></a></td>
-            <td><a class="pokemon-a" href="pokemon-editor.html?team_index=11"></a></td>
+            <td><a class="ai-pokemon-editor-link" href="pokemon-editor.html?team_index=6"></a></td>
+            <td><a class="ai-pokemon-editor-link" href="pokemon-editor.html?team_index=7"></a></td>
+            <td><a class="ai-pokemon-editor-link" href="pokemon-editor.html?team_index=8"></a></td>
+            <td><a class="ai-pokemon-editor-link" href="pokemon-editor.html?team_index=9"></a></td>
+            <td><a class="ai-pokemon-editor-link" href="pokemon-editor.html?team_index=10"></a></td>
+            <td><a class="ai-pokemon-editor-link" href="pokemon-editor.html?team_index=11"></a></td>
         </tr>
     </table>
-    <button id="battle-start-button">バトル開始</button>
+    
+    <form>
+        <label>
+          <input type="radio" name="battle-type" value="シングルバトル" checked> シングルバトル
+        </label>
+        <label>
+          <input type="radio" name="battle-type" value="ダブルバトル"> ダブルバトル
+        </label>
+    </form>
+
+    <button id="start-battle">バトル開始</button>
 </body>
 </html>

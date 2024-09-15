@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カトレアお嬢様</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/server-url.js"></script>
+    <script src="js/base-data.js"></script>>
+    <script src="js/base-const.js"></script>
+    <script src="js/pp-func.js"></script>
+    <script src="js/pokemon.js"></script>
+    <script src="js/team.js"></script>
+    <script src="js/ai.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        table, tr, td {
+            border: 1px solid black;
+        }
+
+        td {
+            padding: 0px;
+            text-align: center; 
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <td>
+                <span>ラティオス ♂ Lv:50</span>
+                <br>
+                <span>現在のHP / 最大HP</span>
+                <br>
+                <img id="player-lead-pokemon0-img" class="flip-image"></img>
+            </td>
+
+            <td>
+                <img src="data/fourth-generation/img/nil.gif"></img>
+            </td>
+
+            <td>
+                <img src="data/fourth-generation/img/nil.gif"></img>
+            </td>
+
+            <td>
+                <span>ラティオス ♂ Lv:50</span>
+                <br>
+                <span>現在のHP / 最大HP</span>
+                <br>
+                <img src="data/fourth-generation/img/hp_bar/100.png">
+                <br>
+                <img id="ai-lead-pokemon0-img"></img>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <span>ラティオス ♂ Lv:50</span>
+                <br>
+                <span>現在のHP / 最大HP</span>
+                <br>
+                <img id="player-lead-pokemon1-img" class="flip-image"></img>
+            </td>
+
+            <td>
+                <img src="data/fourth-generation/img/nil.gif"></img>
+            </td>
+
+            <td>
+                <img src="data/fourth-generation/img/nil.gif"></img>
+            </td>
+
+            <td>
+                <span>ラティオス ♂ Lv:50</span>
+                <br>
+                <span>現在のHP / 最大HP</span>
+                <br>
+                <img id="ai-lead-pokemon1-img"></img>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="4"><h3 id="battle-msg">バトルメッセージ</h3></td>
+        </tr>
+
+        <tr>
+            <td colspan="2"><button id="move1-button" disabled></button></td>
+            <td colspan="2"><button id="move2-button" disabled></button></td>
+        </tr>
+            <td colspan="2"><button id="move3-button" disabled></button></td>
+            <td colspan="2"><button id="move4-button" disabled></button></td>
+        </tr>
+    </table>
+</body>
+</html>

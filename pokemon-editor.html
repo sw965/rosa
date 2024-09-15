@@ -8,9 +8,10 @@
     <script src="js/server-url.js"></script>
     <script src="js/base-data.js"></script>
     <script src="js/base-const.js"></script>
-    <script src="js/move-func.js"></script>
+    <script src="js/pp-func.js"></script>
     <script src="js/pokemon.js"></script>
-    <script src="js/session-storage.js"></script>
+    <script src="js/path.js"></script>
+    <script src="js/team.js"></script>
     <script src="js/pokemon-editor.js"></script>
     <style>
         table {
@@ -31,7 +32,7 @@
             width: 50%;
         }
 
-        .max-min-button {
+        .flex-group {
             display: flex;
         }
 
@@ -41,282 +42,300 @@
     <table>
         <tr>
             <td>
-                <label for="pokemon-select">ポケモン</label>
+                <label for="poke-names">ポケモン</label>
             </td>
             <td>
-                <select id="pokemon-select"></select>
+                <select id="poke-names"></select>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="level-input">レベル</label>
+                <label for="levels">レベル</label>
             </td>
             <td>
-                <input id="level-input" type="number">
+                <input id="levels" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-level-button" class="half-width">最大</button>
-                    <button id="standard-level-button" class="half-width">50</button>
-                    <button id="min-level-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-level" class="half-width">最大</button>
+                    <button id="standard-level" class="half-width">50</button>
+                    <button id="min-level" class="half-width">最小</button>
+                <div>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label for="natures">性格</label>
+            </td>
+            <td>
+                <select id="natures"></select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label for="abilities">特性</label>
+            </td>
+            <td>
+                <select id="abilities"></select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label for="items">持ち物</label>
+            </td>
+            <td>
+                <select id="items"></select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label for="learnset1">技1</label>
+            </td>
+            <td>
+                <select id="learnset1"></select>
+            </td>
+            <td>
+                <label for="move1-point-ups">ポイントアップ(最大PP)</label>
+            </td>
+            <td>
+                <select id="move1-point-ups"></select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label for="learnset2">技2</label>
+            </td>
+            <td>
+                <select id="learnset2"></select>
+            </td>
+            <td>
+                <label for="move2-point-ups">ポイントアップ(最大PP)</label>
+            </td>
+            <td>
+                <select id="move2-point-ups"></select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label for="learnset3">技3</label>
+            </td>
+            <td>
+                <select id="learnset3"></select>
+            </td>
+            <td>
+                <label for="move3-point-ups">ポイントアップ(最大PP)</label>
+            </td>
+            <td>
+                <select id="move3-point-ups"></select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label for="learnset4">技4</label>
+            </td>
+            <td>
+                <select id="learnset4"></select>
+            </td>
+            <td>
+                <label for="move4-point-ups">ポイントアップ(最大PP)</label>
+            </td>
+            <td>
+                <select id="move4-point-ups"></select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label for="hp-individuals">HP個体値</label>
+            </td>
+            <td>
+                <input id="hp-individuals" type="number">
+            </td>
+            <td colspan="2">
+                <div class="flex-group">
+                    <button id="max-hp-individual" class="half-width">最大</button>
+                    <button id="min-hp-individual" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="nature-select">性格</label>
+                <label for="atk-individuals">攻撃個体値</label>
             </td>
             <td>
-                <select id="nature-select"></select>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <label for="move1-select">技1</label>
-            </td>
-            <td>
-                <select id="move1-select"></select>
-            </td>
-            <td>
-                <label for="move1-point-up-select">ポイントアップ(最大PP)</label>
-            </td>
-            <td>
-                <select id="move1-point-up-select"></select>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <label for="move2-select">技2</label>
-            </td>
-            <td>
-                <select id="move2-select"></select>
-            </td>
-            <td>
-                <label for="move2-point-up-select">ポイントアップ(最大PP)</label>
-            </td>
-            <td>
-                <select id="move2-point-up-select"></select>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <label for="move3-select">技3</label>
-            </td>
-            <td>
-                <select id="move3-select"></select>
-            </td>
-            <td>
-                <label for="move3-point-up-select">ポイントアップ(最大PP)</label>
-            </td>
-            <td>
-                <select id="move3-point-up-select"></select>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <label for="move4-select">技4</label>
-            </td>
-            <td>
-                <select id="move4-select"></select>
-            </td>
-            <td>
-                <label for="move4-point-up-select">ポイントアップ(最大PP)</label>
-            </td>
-            <td>
-                <select id="move4-point-up-select"></select>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <label for="hp-iv-input">HP個体値</label>
-            </td>
-            <td>
-                <input id="hp-iv-input" type="number">
+                <input id="atk-individuals" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-hp-iv-button" class="half-width">最大</button>
-                    <button id="min-hp-iv-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-atk-individual" class="half-width">最大</button>
+                    <button id="min-atk-individual" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="atk-iv-input">攻撃個体値</label>
+                <label for="def-individuals">防御個体値</label>
             </td>
             <td>
-                <input id="atk-iv-input" type="number">
+                <input id="def-individuals" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-atk-iv-button" class="half-width">最大</button>
-                    <button id="min-atk-iv-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-def-individual" class="half-width">最大</button>
+                    <button id="min-def-individual" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="def-iv-input">防御個体値</label>
+                <label for="sp-atk-individuals">特攻個体値</label>
             </td>
             <td>
-                <input id="def-iv-input" type="number">
+                <input id="sp-atk-individuals" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-def-iv-button" class="half-width">最大</button>
-                    <button id="min-def-iv-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-sp-atk-individual" class="half-width">最大</button>
+                    <button id="min-sp-atk-individual" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="sp-atk-iv-input">特攻個体値</label>
+                <label for="sp-def-individuals">特防個体値</label>
             </td>
             <td>
-                <input id="sp-atk-iv-input" type="number">
+                <input id="sp-def-individuals" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-sp-atk-iv-button" class="half-width">最大</button>
-                    <button id="min-sp-atk-iv-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-sp-def-individual" class="half-width">最大</button>
+                    <button id="min-sp-def-individual" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="sp-def-iv-input">特防個体値</label>
+                <label for="speed-individuals">素早さ個体値</label>
             </td>
             <td>
-                <input id="sp-def-iv-input" type="number">
+                <input id="speed-individuals" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-sp-def-iv-button" class="half-width">最大</button>
-                    <button id="min-sp-def-iv-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-speed-individual" class="half-width">最大</button>
+                    <button id="min-speed-individual" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="speed-iv-input">素早さ個体値</label>
+                <label for="hp-efforts">HP努力値</label>
             </td>
             <td>
-                <input id="speed-iv-input" type="number">
+                <input id="hp-efforts" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-speed-iv-button" class="half-width">最大</button>
-                    <button id="min-speed-iv-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-hp-effort" class="half-width">最大</button>
+                    <button id="min-hp-effort" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="hp-ev-input">HP努力値</label>
+                <label for="atk-efforts">攻撃努力値</label>
             </td>
             <td>
-                <input id="hp-ev-input" type="number">
+                <input id="atk-efforts" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-hp-ev-button" class="half-width">最大</button>
-                    <button id="min-hp-ev-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-atk-effort" class="half-width">最大</button>
+                    <button id="min-atk-effort" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="atk-ev-input">攻撃努力値</label>
+                <label for="def-efforts">防御努力値</label>
             </td>
             <td>
-                <input id="atk-ev-input" type="number">
+                <input id="def-efforts" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-atk-ev-button" class="half-width">最大</button>
-                    <button id="min-atk-ev-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-def-effort" class="half-width">最大</button>
+                    <button id="min-def-effort" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="def-ev-input">防御努力値</label>
+                <label for="sp-atk-efforts">特攻努力値</label>
             </td>
             <td>
-                <input id="def-ev-input" type="number">
+                <input id="sp-atk-efforts" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-def-ev-button" class="half-width">最大</button>
-                    <button id="min-def-ev-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-sp-atk-effort" class="half-width">最大</button>
+                    <button id="min-sp-atk-effort" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="sp-atk-ev-input">特攻努力値</label>
+                <label for="sp-def-efforts">特防努力値</label>
             </td>
             <td>
-                <input id="sp-atk-ev-input" type="number">
+                <input id="sp-def-efforts" type="number">
             </td>
             <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-sp-atk-ev-button" class="half-width">最大</button>
-                    <button id="min-sp-atk-ev-button" class="half-width">最小</button>
+                <div class ="flex-group">
+                    <button id="max-sp-def-effort" class="half-width">最大</button>
+                    <button id="min-sp-def-effort" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td>
-                <label for="sp-def-ev-input">特防努力値</label>
+                <label for="speed-efforts">素早さ努力値</label>
             </td>
             <td>
-                <input id="sp-def-ev-input" type="number">
+                <input id="speed-efforts" type="number">
             </td>
             <td colspan="2">
-                <div class ="max-min-button">
-                    <button id="max-sp-def-ev-button" class="half-width">最大</button>
-                    <button id="min-sp-def-ev-button" class="half-width">最小</button>
-                </div>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <label for="speed-ev-input">素早さ努力値</label>
-            </td>
-            <td>
-                <input id="speed-ev-input" type="number">
-            </td>
-            <td colspan="2">
-                <div class="max-min-button">
-                    <button id="max-speed-ev-button" class="half-width">最大</button>
-                    <button id="min-speed-ev-button" class="half-width">最小</button>
+                <div class="flex-group">
+                    <button id="max-speed-effort" class="half-width">最大</button>
+                    <button id="min-speed-effort" class="half-width">最小</button>
                 </div>
             </td>
         </tr>
 
         <tr>
             <td colspan="4">
-                <h3 id="stat-h3"></h3>
-                <h3 id="sum-ev-h3"></h3>
+                <h3 id="pokemon-stat"></h3>
+                <h3 id="sum-effort"></h3>
             </td>
         </tr>
         <tr>
@@ -324,9 +343,9 @@
                 <img id="pokemon-img">
             </td>
             <td colspan="2">
-                <button id="file-save-button" class="half-width">ファイル保存</button>
-                <input type="file" id="file-load-input" class="half-width" accept=".json">
-                <button id="page-back-button" class="half-width">戻る</button>
+                <button id="file-save" class="half-width">ファイル保存</button>
+                <input type="file" id="file-load" class="half-width" accept=".json">
+                <button id="page-back" class="half-width">戻る</button>
             </td>
         </tr>
     </table>

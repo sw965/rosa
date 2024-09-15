@@ -64,8 +64,20 @@ const naturedexLoader =
             });
         });
 
-const baseDataLoader = Promise.all([allPokeNamesLoader, pokedexLoader, movedexLoader, allNaturesLoader, naturedexLoader])
+let ALL_ITEMS;
+const allItemsLoader =
+    fetch(makeDataQueryServerFullURL("all_items"))
+        .then(response => {
+            return response.json();
+        })
+        .then(json => {
+            return new Promise(resolve => {
+                ALL_ITEMS = JSON.parse(JSON.stringify(json));
+                resolve();
+            });
+        })
+
+const baseDataLoader = Promise.all([allPokeNamesLoader, pokedexLoader, movedexLoader, allNaturesLoader, naturedexLoader, allItemsLoader])
     .catch(err => {
-        //alert("dawn.exeファイルが実行されていないかもしれません。");
         console.error(err);
     });
