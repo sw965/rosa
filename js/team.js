@@ -55,6 +55,10 @@ const initTeamSessionStorageSetter = baseDataLoader
                 pokemon.name = pokeName;
             }
 
+            if (pokemon.gender === null) {
+                pokemon.gender = pokeData.Genders[0];
+            }
+
             if (pokemon.level === null) {
                 pokemon.level = STANDARD_LEVEL;
             }

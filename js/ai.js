@@ -7,137 +7,205 @@ const MOVE_BUTTON_IDS = [
     "move4-button",
 ];
 
-const PLAYER_LEAD_POKEMON_IMG_IDS = [
-    "player-lead-pokemon0-img",
-    "player-lead-pokemon1-img"
-];
-
-const AI_LEAD_POKEMON_IMG_IDS = [
-    "ai-lead-pokemon0-img",
-    "ai-lead-pokemon1-img"
-];
-
 document.addEventListener("DOMContentLoaded", () => {
-    const url = new URL(BATTLE_COMMAND_SERVER_URL);
-    const playerAction = [
-        {
-            MoveName:"たきのぼり",
-            SrcIndex:0,
-            TargetIndex:0,
-            Speed:100
-        },
-        {
-            MoveName:"ほのおのパンチ",
-            SrcIndex:1,
-            TargetIndex:0,
-            Speed:0
-        },
+    function getPokeNameGenderLevelText(pokeName, gender, level) {
+        return pokeName + " " + gender + " " + "Lv." + level;
+    }
+
+    function getHPText(max, current) {
+        return max + " / " + current;
+    }
+
+    const BATTLE_MESSAGE = document.getElementById("battle-msg");
+    const PLAYER_LEAD_POKE_NAME_GENDER_LEVEL_SPANS = document.getElementsByClassName("player-lead-poke-name-gender-level");
+    const PLAYER_LEAD_HP_SPANS = document.getElementsByClassName("player-lead-hp");
+    const PLAYER_LEAD_POKEMON_IMGS = document.getElementsByClassName("player-lead-pokemon-img");
+    const AI_LEAD_POKE_NAME_GENDER_LEVEL_SPANS = document.getElementsByClassName("ai-lead-poke-name-gender-level");
+    const AI_LEAD_HP_SPANS = document.getElementsByClassName("ai-lead-hp");
+    const AI_LEAD_POKEMON_IMGS = document.getElementsByClassName("ai-lead-pokemon-img");
+
+    function push(playerAction, aiAction) {
+        const url = new URL(BATTLE_COMMAND_SERVER_URL);
+        url.searchParams.append("player_action", encodeURIComponent(JSON.stringify(playerAction)));
+        url.searchParams.append("ai_action", encodeURIComponent(JSON.stringify(aiAction)));
+        url.searchParams.append("command_type", encodeURIComponent("push"));
+    
+        fetch(url.toString())
+            .then(response => {
+                return response.json();
+            })
+            .then(responseJson => {
+                const battles = JSON.parse(JSON.stringify(responseJson));
+                if (!battles.every(battle => battle.CurrentSelfIsHost)) {
+                    alert("bippaのserver.goから送信されるbattleは全て、battle.CurrentSelfIsHost === true でなければならない。");
+                    return;
+                };
+        
+                let prevBattle = battles[0];
+                const leadLength = prevBattle.CurrentSelfLeadPokemons.length;
+                const benchLength = prevBattle.CurrentSelfBenchPokemons.length;
+        
+                if (prevBattle.CurrentOpponentLeadPokemons.length !== leadLength) {
+                    alert("プレイヤーの先頭のポケモンの数と、AIの先頭のポケモンの数が異なります。");
+                    return;
+                };
+        
+                if (prevBattle.CurrentOpponentBenchPokemons.length !== benchLength) {
+                    alert("プレイヤーの控えのポケモンの数と、AIの控えのポケモンの数が異なります。");
+                    return;
+                };
+        
+                let index = 1;
+                function updateUI() {
+                    if (index >= battles.length) {
+                        return;
+                    }
+    
+                    const currentBattle = battles[index];
+                    currentBattle.CurrentSelfLeadPokemons.forEach((pokemon, i) => {
+                        if (pokemon.Name === "") {
+                            PLAYER_LEAD_POKE_NAME_GENDER_LEVEL_SPANS[i].innerHTML = "";
+                            PLAYER_LEAD_POKEMON_IMGS[i].src = getPokemonImgPath("空白");
+                        } else {
+                            PLAYER_LEAD_POKE_NAME_GENDER_LEVEL_SPANS[i].innerHTML = getPokeNameGenderLevelText(pokemon.Name, pokemon.Gender, pokemon.Level);
+                            PLAYER_LEAD_POKEMON_IMGS[i].src = getPokemonImgPath(pokemon.Name);
+                        }
+                    });
+                    
+                    currentBattle.CurrentOpponentLeadPokemons.forEach((pokemon, i) => {
+                        if (pokemon.Name === "") {
+                            AI_LEAD_POKE_NAME_GENDER_LEVEL_SPANS[i].innerHTML = "";
+                            AI_LEAD_POKEMON_IMGS[i].src = getPokemonImgPath("空白");
+                        } else {
+                            AI_LEAD_POKE_NAME_GENDER_LEVEL_SPANS[i].innerHTML = getPokeNameGenderLevelText(pokemon.Name, pokemon.Gender, pokemon.Level);
+                            AI_LEAD_POKEMON_IMGS[i].src = getPokemonImgPath(pokemon.Name);
+                        }           
+                    });
+    
+                    function next() {
+                        index += 1;
+                        prevBattle = currentBattle;
+                    };
+    
+                    let isCurrentHPAnimation = false;
+    
+                    function innerTextAnimation(ele, texts, interval) {
+                        const steps = texts.length;
+                        return new Promise(resolve => {
+                            let i = 0;
+                            function update() {
+                                if (i < steps) {
+                                    ele.innerText = texts[i];
+                                    i++;
+                                    setTimeout(update, interval);
+                                } else {
+                                    resolve();
+                                }
+                            };
+                            update();
+                        });
+                    };
+    
+                    function currentHPAnimation(currentPokemons, prevPokemons, eles) {
+                        return currentPokemons.map((currentPokemon, i) => {
+                            //ポケモンを引っ込めた時(交代時)の、現在のHPの変化は無視する。
+                            if (currentPokemon.Name == "" && currentPokemon.Stat.MaxHP == 0 && currentPokemon.Stat.CurrentHP == 0) {
+                                return Promise.resolve();
+                            };
+
+                            const prevPokemon = prevPokemons[i];
+                            //ポケモンを繰り出した時(交代時)の、現在のHPの変化は無視する。
+                            //一つ前の状態がポケモンを引っ込めた状態であれば、現在はポケモンを繰り出す状態と判断出来る。
+                            if (prevPokemon.Name == "" && prevPokemon.Stat.MaxHP == 0 && prevPokemon.Stat.CurrentHP == 0) {
+                                return Promise.resolve();
+                            };
+
+                            const prevCurrentHP = prevPokemon.Stat.CurrentHP;
+                            if (currentPokemon.Stat.CurrentHP !== prevCurrentHP) {
+                                if (currentPokemon.Stat.MaxHP !== prevPokemon.Stat.MaxHP) {
+                                    alert("現在のHPが変化している所で、最大HPも変化しているバグが発生している。");
+                                    return Promise.resolve();
+                                }
+                                isCurrentHPAnimation = true;
+                        
+                                const diff = currentPokemon.Stat.CurrentHP - prevCurrentHP;
+                                const step = Math.abs(diff);
+                                const texts = [];
+                                for (let j = 0; j <= step; j++) {
+                                    const currentHP = prevCurrentHP + Math.sign(diff) * j;
+                                    const text = getHPText(currentPokemon.Stat.MaxHP, currentHP);
+                                    texts.push(text);
+                                }
+                                return innerTextAnimation(eles[i], texts, 100);
+                            }
+                            return Promise.resolve();
+                        });
+                    };
+    
+                    const playerCurrentHPAnimation = currentHPAnimation(currentBattle.CurrentSelfLeadPokemons, prevBattle.CurrentSelfLeadPokemons, PLAYER_LEAD_HP_SPANS);
+                    const aiCurrentHPAnimation = currentHPAnimation(currentBattle.CurrentOpponentLeadPokemons, prevBattle.CurrentOpponentLeadPokemons, AI_LEAD_HP_SPANS);
+    
+                    if (isCurrentHPAnimation) {
+                        const ps = playerCurrentHPAnimation.concat(aiCurrentHPAnimation)
+                        Promise.all(ps).then(() => {
+                            next();
+                            updateUI();
+                        });
+                        return;
+                    };
+        
+                    if (currentBattle.HostViewMessage !== prevBattle.HostViewMessage) {
+                        let texts = [];
+                        let msg = "";
+                        for (const m of currentBattle.HostViewMessage) {
+                            msg += m;
+                            texts.push(msg);
+                        };      
+                        const promise = innerTextAnimation(BATTLE_MESSAGE, texts, 100);
+                        promise.then(() => {
+                            next();
+                            updateUI();
+                        })
+                        return
+                    };
+                    next();
+                    setTimeout(updateUI(), 1000);
+                }
+                updateUI();
+            });
+    };
+
+    const action = [
+        [
+            {
+                MoveName:"たきのぼり",
+                SrcIndex:0,
+                Speed:100,
+            },
+            {
+                MoveName:"",
+                SrcIndex:1,
+                BenchIndex:0,
+                Speed:1,
+            },
+        ],
+        
+        [
+            {
+                MoveName:"たきのぼり",
+                SrcIndex:0,
+                Speed:100,
+            },
+            {
+                MoveName:"ほのおのパンチ",
+                SrcIndex:1,
+                Speed:1,
+            },
+        ],
     ];
-
-    const aiAction = [
-        {
-            MoveName:"たきのぼり",
-            SrcIndex:0,
-            TargetIndex:0,
-            Speed:100
-        },
-        {
-            MoveName:"ほのおのパンチ",
-            SrcIndex:1,
-            TargetIndex:0,
-            Speed:0
-        },
-    ];
-
-    url.searchParams.append("player_action", encodeURIComponent(JSON.stringify(playerAction)));
-    url.searchParams.append("ai_action", encodeURIComponent(JSON.stringify(aiAction)));
-    url.searchParams.append("command_type", encodeURIComponent("push"));
-
-    fetch(url.toString())
-        .then(response => {
-            return response.json();
-        })
-        .then(json => {
-            const battles = JSON.parse(JSON.stringify(json));
-            let lastBattle = battles[0];
-            const leadLength = lastBattle.CurrentSelfLeadPokemons.length;
-            const benchLength = lastBattle.CurrentSelfBenchPokemons.length;
-            console.log("2leng", leadLength, benchLength);
-
-            if (lastBattle.CurrentOpponentLeadPokemons.length !== leadLength) {
-                alert("プレイヤーの先頭のポケモンの数と、AIの先頭のポケモンの数が異なります。");
-                return;
-            };
-
-            if (lastBattle.CurrentOpponentBenchPokemons.length !== benchLength) {
-                alert("プレイヤーの控えのポケモンの数と、AIの控えのポケモンの数が異なります。");
-                return;
-            };
-
-            for (const battle of battles.slice(1)) {
-                if (battle.CurrentSelfLeadPokemons.length !== leadLength) {
-                    alert("プレイヤーの先頭のポケモンの数が、試合中に変化しています。");
-                    return;
-                };
-
-                if (battle.CurrentSelfBenchPokemons.length !== benchLength) {
-                    alert("プレイヤーの控えのポケモンの数が、試合中に変化しています。");
-                    return;
-                };
-
-                if (battle.CurrentOpponentLeadPokemons.length !== leadLength) {
-                    console.log(battle.CurrentOpponentLeadPokemons);
-                    alert("AIの先頭のポケモンの数が、試合中に変化しています。");
-                    return;
-                };
-
-                if (battle.CurrentOpponentBenchPokemons.length !== benchLength) {
-                    console.log(battle.CurrentOpponentBenchPokemons);
-                    alert("AIの控えのポケモンの数が、試合中に変化しています。");
-                    return;
-                };
-
-                const diff = {
-                    currentSelf:{
-                        pokeNames:new Array(leadLength).fill(false),
-                        genders:new Array(leadLength).fill(false),
-                        levels:new Array(leadLength).fill(false),
-                        maxHPs:new Array(leadLength).fill(false),
-                        currentHPs:new Array(leadLength).fill(false),
-                    },
-
-                    currentOpponent:{
-                        pokeNames:new Array(leadLength).fill(false),
-                        genders:new Array(leadLength).fill(false),
-                        levels:new Array(leadLength).fill(false),
-                        maxHPs:new Array(leadLength).fill(false),
-                        currentHPs:new Array(leadLength).fill(false),
-                    },
-
-                    hostViewMessage:false,
-                };
-
-                battle.CurrentSelfLeadPokemons.map((pokemon, i) => {
-                    const lastPokemon = lastBattle.CurrentSelfLeadPokemons[i];
-                    if (pokemon.Name !== lastPokemon.Name) {
-                        console.log("self:", pokemon.Name);
-                    };
-
-                    if (pokemon.Level !== lastPokemon.Level) {
-                        console.log("self:", pokemon.Level);
-                    };
-
-                    if (pokemon.Gender !== lastPokemon.Gender) {
-                        console.log("self:", pokemon.Gender);
-                    };
-                });
-            };
-        })
-        .catch(err => {
-            console.log("エラー");
-            console.error(err);
-        });
+    push(action[0], action[1]);
 });
+
 // document.addEventListener("DOMContentLoaded", () => {
 //     const MOVE_BUTTONS = MOVE_BUTTON_IDS.map(id => {
 //         return document.getElementById(id);

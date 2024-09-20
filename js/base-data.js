@@ -79,5 +79,6 @@ const allItemsLoader =
 
 const baseDataLoader = Promise.all([allPokeNamesLoader, pokedexLoader, movedexLoader, allNaturesLoader, naturedexLoader, allItemsLoader])
     .catch(err => {
+        alert("server.exeを起動していないかもしれません。");
         console.error(err);
     });

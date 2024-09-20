@@ -7,43 +7,172 @@ const initPokemonSetter = initTeamSessionStorageSetter
         INIT_POKEMON = TeamSessionStorage.get(TEAM_INDEX);
     });
 
-const POKEMON_IMG_ID = "pokemon-img";
-
 document.addEventListener("DOMContentLoaded", () => {
     const POKE_NAME_SELECT = document.getElementById("poke-names");
+    POKE_NAME_SELECT.addEventListener("change", () => {
+        const pokeName = POKE_NAME_SELECT.value
+        switchTypes(pokeName);
+        switchGender(pokeName);
+        switchAbility(pokeName);
+        switchLearnset(pokeName);
+        updatePokemonStat(makePokemon());
+        POKEMON_IMG.src = getPokemonImgPath(pokeName);
+    });
+
+    const TYPE_IMGS = [
+        document.getElementById("type1"),
+        document.getElementById("type2"),
+    ];
+    const INIT_IMG_DISPLAY = TYPE_IMGS[1].style.display;
+    //タイプが1つだけのポケモンの場合でも、画像が中央寄せになるように。
+    TYPE_IMGS[1].style.display = "none";
+
+    function switchTypes(pokeName) {
+        const types = POKEDEX[pokeName].Types;
+        TYPE_IMGS[0].src = getTypeImgPath(types[0]);
+        if (types.length === 1) {
+            //タイプが1つならば、2つ目のタイプの画像を隠す
+            TYPE_IMGS[1].style.display = "none";
+        } else {
+            TYPE_IMGS[1].src = getTypeImgPath(types[1]);
+            TYPE_IMGS[1].style.display = INIT_IMG_DISPLAY;
+        };
+    };
+
+    const GENDER_COLORS = {
+        "♂": "blue",
+        "♀": "pink",
+        "不明":"black",
+    };
+
+    const GENDER_SELECT = document.getElementById("genders");
+
+    function switchGender(pokeName) {
+        const value = GENDER_SELECT.value;
+        const options = Array.from(GENDER_SELECT);
+        //要素を全て削除する。
+        options.forEach(option => {
+            GENDER_SELECT.removeChild(option);
+        });
+
+        const genders = POKEDEX[pokeName].Genders
+        //新しい要素を追加する。
+        genders.forEach(gender => {
+            const option = document.createElement("option");
+            option.innerText = gender;
+            option.style.color = GENDER_COLORS[gender];
+            option.value = gender;
+            GENDER_SELECT.appendChild(option);
+        });
+
+        //選択されていた性別が、切り替えた後ポケモンにとって適切な性別ならば、その性別を設定する。
+        if (genders.includes(value)) {
+            GENDER_SELECT.value = value;
+        };
+
+        GENDER_SELECT.style.color = GENDER_COLORS[GENDER_SELECT.value];
+    };
+
+    GENDER_SELECT.addEventListener("change", () => {
+        GENDER_SELECT.style.color = GENDER_COLORS[GENDER_SELECT.value];
+    });
 
     const LEVEL_INPUT = document.getElementById("levels");
     LEVEL_INPUT.min = MIN_LEVEL;
     LEVEL_INPUT.max = MAX_LEVEL;
     LEVEL_INPUT.step = 1;
     LEVEL_INPUT.value = STANDARD_LEVEL;
+
+    LEVEL_INPUT.addEventListener("keydown", () => {
+        const key = event.key;
+        if (key === "ArrowUp" || key === "ArrowDown" || key === "Tab") {
+            return;
+        } else {
+            event.preventDefault();
+        }
+    });
+
+    LEVEL_INPUT.addEventListener("input", () => {
+        updatePokemonStat(makePokemon());
+    });
+
     const MAX_LEVEL_BUTTON = document.getElementById("max-level");
+
+    MAX_LEVEL_BUTTON.addEventListener("click", ()=> {
+        LEVEL_INPUT.value = MAX_LEVEL;
+        updatePokemonStat(makePokemon());
+    });
+
     const STANDARD_LEVEL_BUTTON = document.getElementById("standard-level");
+
+    STANDARD_LEVEL_BUTTON.addEventListener("click", () => {
+        LEVEL_INPUT.value = STANDARD_LEVEL;
+        updatePokemonStat(makePokemon());
+    });
+
     const MIN_LEVEL_BUTTON = document.getElementById("min-level");
 
+    MIN_LEVEL_BUTTON.addEventListener("click", () => {
+        LEVEL_INPUT.value = MIN_LEVEL;
+        updatePokemonStat(makePokemon());
+    });
+
     const NATURE_SELECT = document.getElementById("natures");
+
+    function getNatureBonusText() {
+        const natureData = NATUREDEX[NATURE_SELECT.value];
+        const atk = natureData.AtkBonus;
+        const def = natureData.DefBonus;
+        const spAtk = natureData.SpAtkBonus;
+        const spDef = natureData.SpDefBonus;
+        const speed = natureData.SpeedBonus;
+
+        return "{攻撃：" + atk.toFixed(1) + "}"
+        + "{防御：" + def.toFixed(1) + "}"
+        + "{特攻：" + spAtk.toFixed(1) + "}"
+        + "{特防：" + spDef.toFixed(1) + "}"
+        + "{素早さ：" + speed.toFixed(1) + "}"; 
+    };
+
+    NATURE_SELECT.addEventListener("change", () => {
+        updatePokemonStat(makePokemon());
+        NATURE_BONUS_TD.innerText = getNatureBonusText();
+    });
+
+    const NATURE_BONUS_TD = document.getElementById("nature-bonus");
     const ABILITY_SELECT = document.getElementById("abilities");
 
     //ポケモン名が切り替わった時に、呼び出す。
     function switchAbility(pokeName) {
+        const value = ABILITY_SELECT.value;
         const options = Array.from(ABILITY_SELECT);
 
         //要素を全て削除する。
-        options.map(option => {
+        options.forEach(option => {
             ABILITY_SELECT.removeChild(option);
         });
 
         const abilities = POKEDEX[pokeName].Abilities
         //新しい要素を追加する。
-        abilities.map(ability => {
+        abilities.forEach(ability => {
             const option = document.createElement("option");
             option.innerText = ability;
             option.value = ability;
             ABILITY_SELECT.appendChild(option);
         });
+
+        //選択されていた特性が、切り替えた後ポケモンにとって適切な特性ならば、その特性を設定する。
+        if (abilities.includes(value)) {
+            ABILITY_SELECT.value = value;
+        };
     };
 
     const ITEM_SELECT = document.getElementById("items");
+    ITEM_SELECT.addEventListener("change", () => {
+        ITEM_IMG.src = getItemImgPath(ITEM_SELECT.value);
+    });
+
+    const ITEM_IMG = document.getElementById("item-img");
 
     const LEARNSET_SELECTS = [
         "learnset1",
@@ -61,8 +190,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return moveName != NONE;
         });
 
-        LEARNSET_SELECTS.map(select => {
-            Array.from(select.options).map(option => {
+        LEARNSET_SELECTS.forEach(select => {
+            Array.from(select.options).forEach(option => {
                 //同じ技を2つ以上選択出来ないように、hiddenで隠す。
                 if (values.includes(option.value)) {
                     option.hidden = true;
@@ -76,9 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
     //ポケモン名が切り替わった時に、呼び出す。
     function switchLearnset(pokeName) {
         //全ての要素(option)を削除する。
-        LEARNSET_SELECTS.map(select => {
+        LEARNSET_SELECTS.forEach(select => {
             const options = Array.from(select.options);
-            options.map(option => {
+            options.forEach(option => {
                 select.removeChild(option);
             });
         });
@@ -96,7 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             //valuesを新たな値として、selectに追加する。
-            values.map(moveName => {
+            values.forEach(moveName => {
                 const option = document.createElement("option");
                 option.innerText = moveName;
                 option.value = moveName;
@@ -117,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function switchPointUp(i, moveName) {
         const select = POINT_UP_SELECTS[i];
         const options = Array.from(select.options);
-        options.map(option => {
+        options.forEach(option => {
             select.removeChild(option);
         });
     
@@ -126,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const basePP = MOVEDEX[moveName].BasePP;
-        ALL_POINT_UPS.toReversed().map(pointUp => {
+        ALL_POINT_UPS.toReversed().forEach(pointUp => {
             const option = document.createElement("option");
             option.value = pointUp;
             option.innerText = `${pointUp}(${calcPowerPoint(basePP, pointUp)})`;
@@ -262,6 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const pokemon = new Pokemon();
         pokemon.name = POKE_NAME_SELECT.value;
+        pokemon.gender = GENDER_SELECT.value;
         pokemon.level = parseInt(LEVEL_INPUT.value, 10);
         pokemon.nature = NATURE_SELECT.value;
         pokemon.ability = ABILITY_SELECT.value;
@@ -275,65 +405,25 @@ document.addEventListener("DOMContentLoaded", () => {
         return pokemon;
     };
 
-    POKE_NAME_SELECT.addEventListener("change", () => {
-        const pokeName = POKE_NAME_SELECT.value
-        switchAbility(pokeName);
-        switchLearnset(pokeName);
-        updatePokemonStat(makePokemon());
-        POKEMON_IMG.src = getPokemonImgPath(pokeName);
-    });
-
-    LEVEL_INPUT.addEventListener("keydown", () => {
-        const key = event.key;
-        if (key === "ArrowUp" || key === "ArrowDown" || key === "Tab") {
-            return;
-        } else {
-            event.preventDefault();
-        }
-    });
-
-    LEVEL_INPUT.addEventListener("input", () => {
-        updatePokemonStat(makePokemon());
-    });
-
-    MAX_LEVEL_BUTTON.addEventListener("click", ()=> {
-        LEVEL_INPUT.value = MAX_LEVEL;
-        updatePokemonStat(makePokemon());
-    });
-
-    STANDARD_LEVEL_BUTTON.addEventListener("click", () => {
-        LEVEL_INPUT.value = STANDARD_LEVEL;
-        updatePokemonStat(makePokemon());
-    })
-
-    MIN_LEVEL_BUTTON.addEventListener("click", () => {
-        LEVEL_INPUT.value = MIN_LEVEL;
-        updatePokemonStat(makePokemon());
-    });
-
-    NATURE_SELECT.addEventListener("change", () => {
-        updatePokemonStat(makePokemon());
-    })
-
-    const POKEMON_IMG = document.getElementById(POKEMON_IMG_ID);
+    const POKEMON_IMG = document.getElementById("pokemon-img");
 
     initPokemonSetter
         .then(() => {
-            ALL_POKE_NAMES.map(pokeName => {
+            ALL_POKE_NAMES.forEach(pokeName => {
                 option = document.createElement("option");
                 option.innerText = pokeName;
                 option.value = pokeName;
                 POKE_NAME_SELECT.appendChild(option);
             });
 
-            ALL_NATURES.map(nature => {
+            ALL_NATURES.forEach(nature => {
                 option = document.createElement("option");
                 option.innerText = nature;
                 option.value = nature;
                 NATURE_SELECT.appendChild(option);
             });
 
-            [NONE].concat(ALL_ITEMS).map(item => {
+            [NONE].concat(ALL_ITEMS).forEach(item => {
                 option = document.createElement("option");
                 option.innerText = item;
                 option.value = item;
@@ -343,32 +433,36 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(() => {
             if (INIT_POKEMON.name !== null) {
                 POKE_NAME_SELECT.value = INIT_POKEMON.name;
+                switchTypes(POKE_NAME_SELECT.value);
+                switchGender(POKE_NAME_SELECT.value);
                 switchAbility(POKE_NAME_SELECT.value);
                 switchLearnset(POKE_NAME_SELECT.value);
                 POKEMON_IMG.src = getPokemonImgPath(POKE_NAME_SELECT.value);
             } else {
                 POKEMON_IMG.src = getPokemonImgPath(ALL_POKE_NAMES[0]);
-            }
+            };
 
             if (INIT_POKEMON.nature !== null) {
                 NATURE_SELECT.value = INIT_POKEMON.nature;
-            }
+                NATURE_BONUS_TD.innerText = getNatureBonusText(NATURE_SELECT.value);
+            };
 
             if (INIT_POKEMON.ability !== null) {
                 ABILITY_SELECT.value = INIT_POKEMON.ability;
-            }
+            };
 
             if (INIT_POKEMON.item !== null) {
                 ITEM_SELECT.value = INIT_POKEMON.item;
-            }
+                ITEM_IMG.src = getItemImgPath(ITEM_SELECT.value);
+            };
 
             if (INIT_POKEMON.moveNames !== null) {
-                LEARNSET_SELECTS.map((select, i) => {
+                LEARNSET_SELECTS.forEach((select, i) => {
                     select.value = INIT_POKEMON.moveNames[i];
                 });
-            }
+            };
 
-            LEARNSET_SELECTS.map((select, i) => {
+            LEARNSET_SELECTS.forEach((select, i) => {
                 select.addEventListener("change", () => {
                     hideLearnsetDuplicates();
                     switchPointUp(i, select.value);
@@ -377,21 +471,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             for (const [i, select] of LEARNSET_SELECTS.entries()) {
                 switchPointUp(i, select.value);
-            }
+            };
 
             if (INIT_POKEMON.pointUps !== null) {
-                POINT_UP_SELECTS.map((select, i) => {
+                POINT_UP_SELECTS.forEach((select, i) => {
                     const moveName = LEARNSET_SELECTS[i].value
                     if (moveName !== NONE) {
                         select.value = INIT_POKEMON.pointUps[i];
                     };
                 });
-            }
+            };
         });
 
     initPokemonSetter
         .then(() => {
-            INDIVIDUAL_INPUTS.map((ivInput, i) => {
+            INDIVIDUAL_INPUTS.forEach((ivInput, i) => {
                 ivInput.min = MIN_INDIVIDUAL;
                 ivInput.max = MAX_INDIVIDUAL;
                 const initIV = INIT_POKEMON.getIndividuals()[i];
@@ -399,7 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     ivInput.value = initIV;
                 } else {
                     ivInput.value = MAX_IV;
-                }
+                };
                 ivInput.step = 1;
         
                 ivInput.addEventListener("keydown", event => {
@@ -408,7 +502,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     } else {
                         event.preventDefault();
-                    }
+                    };
                 });
 
                 ivInput.addEventListener("input", () => {
@@ -429,7 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     initPokemonSetter
         .then(() => {
-            EFFORT_INPUTS.map((evInput, i) => {
+            EFFORT_INPUTS.forEach((evInput, i) => {
                 evInput.min = MIN_EFFORT;
                 evInput.max = MAX_EFFORT;
         
@@ -438,7 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     evInput.value = initEV;
                 } else {
                     evInput.value = MIN_EFFORT;
-                }
+                };
                 evInput.step = EFFECT_EFFORT;
                 
                 evInput.addEventListener("keydown", event => {
@@ -447,7 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         return;
                     } else {
                         event.preventDefault();
-                    }
+                    };
                 });
         
                 evInput.addEventListener("input", event => {
@@ -455,7 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         event.target.value -= EFFECT_EFFORT;
                     } else {
                         updateSumEffort();
-                    }
+                    };
                     updatePokemonStat(makePokemon());
                 });
         
@@ -465,7 +559,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         evInput.value = MAX_EFFORT;
                     } else {
                         evInput.value = Math.floor(remainingEV / EFFECT_EFFORT) * EFFECT_EFFORT;
-                    }
+                    };
                     updatePokemonStat(makePokemon());
                     updateSumEffort();
                 });
@@ -507,42 +601,48 @@ document.addEventListener("DOMContentLoaded", () => {
         const reader = new FileReader();
         reader.onload = e => {
             const pokemon = objectToPokemon(JSON.parse(e.target.result));
-            console.log("abi", pokemon.name, pokemon.ability);
             POKE_NAME_SELECT.value = pokemon.name;
+            switchTypes(pokemon.name);
+
+            GENDER_SELECT.value = pokemon.gender;
+            GENDER_SELECT.style.color = GENDER_COLORS[GENDER_SELECT.value];
 
             NATURE_SELECT.value = pokemon.nature;
+            NATURE_BONUS_TD.innerText = getNatureBonusText();
+
             switchAbility(pokemon.name);
             ABILITY_SELECT.value = pokemon.ability;
             ITEM_SELECT.value = pokemon.item;
+            ITEM_IMG.src = getItemImgPath(ITEM_SELECT.value);
 
             switchLearnset(pokemon.name);
-            pokemon.moveNames.map((moveName, i) => {
+            pokemon.moveNames.forEach((moveName, i) => {
                 LEARNSET_SELECTS[i].value = moveName;
             });
 
-            pokemon.pointUps.map((pointUp, i) => {
+            pokemon.pointUps.forEach((pointUp, i) => {
                 POINT_UP_SELECTS[i].value = pointUp;
                 switchPointUp(i, pokemon.moveNames[i]);
             });
 
             const ivArray = pokemon.getIndividuals();
-            INDIVIDUAL_INPUTS.map((input, i) => {
+            INDIVIDUAL_INPUTS.forEach((input, i) => {
                 input.value = ivArray[i];
             });
 
             const evArray = pokemon.getEfforts();
-            EFFORT_INPUTS.map((input, i) => {
+            EFFORT_INPUTS.forEach((input, i) => {
                 input.value = evArray[i];                
-            })
+            });
 
             updateSumEffort();
             POKEMON_IMG.src = getPokemonImgPath(pokemon.name);
         };
         reader.readAsText(file);
+        FILE_LOAD_INPUT.value = "";
     });
 
     const PAGE_BACK_BUTTON = document.getElementById("page-back");
-
     movedexLoader.
         then(() => {
             PAGE_BACK_BUTTON.addEventListener("click", () => {

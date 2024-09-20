@@ -1,6 +1,7 @@
 class Pokemon {
     constructor() {
         this.name = null;
+        this.gender = null;
         this.level = null;
 
         this.nature = null;
@@ -58,7 +59,7 @@ class Pokemon {
         this.turnCount = null;
 
         /*
-            bippa(go言語)側のPokemon構造体には、下の属性もあるが、js側からは操作しない為、削除する。
+            bippa(go言語)側のPokemon構造体には、下記の属性もあるが、js側からは操作しない為、削除する。
             this.thisTurnPlannedUseMoveName
         */
     }
@@ -133,18 +134,6 @@ class Pokemon {
         this.stat.speed = new PokemonEachStatCalculator(pokeData.BaseSpeed, this.level, this.individualStat.speed, this.effortStat.speed).hpOther(natureData.SpeedBonus);
     }
 
-    //命名が気になる
-    getStatText() {
-        let text = "";
-        text += "(HP：" + this.stat.maxHP + ")";
-        text += " (攻撃：" + this.stat.atk + ")";
-        text += " (防御：" + this.stat.def + ")";
-        text += " (特攻：" + this.stat.spAtk + ")";
-        text += " (特防：" + this.stat.spDef + ")";
-        text += " (素早さ：" + this.stat.speed + ")";
-        return text;
-    }
-
     initBattleAttribute() {
         this.types = POKEDEX[this.name].Types;
         this.statusAilment = "";
@@ -166,6 +155,7 @@ class Pokemon {
 function objectToPokemon(obj) {
     const pokemon = new Pokemon();
     pokemon.name = obj.name;
+    pokemon.gender = obj.gender;
     pokemon.level = obj.level;
 
     pokemon.nature = obj.nature;

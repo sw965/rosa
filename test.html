@@ -1,17 +1,48 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ファイル読み込み</title>
+    <title>特定の場所にだけ線をつけるテーブル</title>
+    <style>
+        table, td, th {
+            border: none; /* 全体の線を消す */
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        /* 特定の行に下線を追加 */
+        tr.specific-row td {
+            border-bottom: 1px solid black;
+        }
+
+        /* 特定のセルに線を追加 */
+        td.border-cell {
+            border: 1px solid black;
+        }
+
+        /* 特定の列に右側の線を追加 */
+        td.specific-column {
+            border-right: 1px solid black;
+        }
+    </style>
 </head>
 <body>
-    <input type="file" id="fileInput">
-    <pre id="fileContent"></pre>
-
-    <script>
-        
-    </script>
+    <table>
+        <tr class="specific-row">
+            <td>行1, セル1</td>
+            <td>行1, セル2</td>
+        </tr>
+        <tr>
+            <td class="specific-cell">行2, セル1</td>
+            <td>行2, セル2</td>
+        </tr>
+        <tr>
+            <td>行3, セル1</td>
+            <td class="specific-column">行3, セル2</td>
+        </tr>
+    </table>
 </body>
 </html>
-
