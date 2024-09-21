@@ -442,6 +442,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 POKEMON_IMG.src = getPokemonImgPath(ALL_POKE_NAMES[0]);
             };
 
+            if (INIT_POKEMON.gender !== null) {
+                GENDER_SELECT.value = INIT_POKEMON.gender;
+                GENDER_SELECT.style.color = GENDER_COLORS[GENDER_SELECT.value];
+            }
+
+            if (INIT_POKEMON.level !== null) {
+                LEVEL_INPUT.value = INIT_POKEMON.level;
+            }
+
             if (INIT_POKEMON.nature !== null) {
                 NATURE_SELECT.value = INIT_POKEMON.nature;
                 NATURE_BONUS_TD.innerText = getNatureBonusText(NATURE_SELECT.value);

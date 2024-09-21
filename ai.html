@@ -31,6 +31,10 @@
             border: 1px solid black;
         }
 
+        .command-td {
+            width: 125px;
+            height: 75px;
+        }
     </style>
 </head>
 <body>
@@ -92,14 +96,16 @@
         <tr>
             <td class="border-cell" colspan="4"><h3 id="battle-msg">バトルメッセージ</h3></td>
         </tr>
+    </table>
 
+    <table>
         <tr>
-            <td class="border-cell" colspan="2"><button id="move1-button" disabled></button></td>
-            <td class="border-cell" colspan="2"><button id="move2-button" disabled></button></td>
+            <td class="border-cell command-td" colspan="2"><button class="command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
+            <td class="border-cell command-td" colspan="2"><button class="command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
         </tr>
         <tr>
-            <td class="border-cell" colspan="2"><button id="move3-button" disabled></button></td>
-            <td class="border-cell" colspan="2"><button id="move4-button" disabled></button></td>
+            <td class="border-cell command-td" colspan="2"><button class="command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
+            <td class="border-cell command-td" colspan="2"><button class="command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
         </tr>
     </table>
 </body>

@@ -99,15 +99,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     .then(response => {
                         return response.json();
                     })
-                    .then((responseJson) => {
-                        if (responseJson === "ok") {
-                            location.href = "ai.html";
-                        } else {
-                            alert("バトルの初期化に失敗しました。");
-                        }
-                    })
+                    .then((json) => {
+                        sessionStorage.setItem("initBattles", JSON.stringify(json));
+                        location.href = "ai.html";
+                    });
             });
-        })
+        });
 
         let draggedImg;
         initTeamSessionStorageSetter
