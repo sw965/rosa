@@ -396,7 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
         pokemon.nature = NATURE_SELECT.value;
         pokemon.ability = ABILITY_SELECT.value;
         pokemon.item = ITEM_SELECT.value;
-        pokemon.moveNames = moveNames;
+        pokemon.learnedMoveNames = moveNames;
         pokemon.pointUps = pointUps;
         pokemon.updateMoveset();
         pokemon.individualStat = individualStat;
@@ -465,9 +465,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 ITEM_IMG.src = getItemImgPath(ITEM_SELECT.value);
             };
 
-            if (INIT_POKEMON.moveNames !== null) {
+            if (INIT_POKEMON.learnedMoveNames !== null) {
                 LEARNSET_SELECTS.forEach((select, i) => {
-                    select.value = INIT_POKEMON.moveNames[i];
+                    select.value = INIT_POKEMON.learnedMoveNames[i];
                 });
             };
 
@@ -625,13 +625,13 @@ document.addEventListener("DOMContentLoaded", () => {
             ITEM_IMG.src = getItemImgPath(ITEM_SELECT.value);
 
             switchLearnset(pokemon.name);
-            pokemon.moveNames.forEach((moveName, i) => {
+            pokemon.learnedMoveNames.forEach((moveName, i) => {
                 LEARNSET_SELECTS[i].value = moveName;
             });
 
             pokemon.pointUps.forEach((pointUp, i) => {
                 POINT_UP_SELECTS[i].value = pointUp;
-                switchPointUp(i, pokemon.moveNames[i]);
+                switchPointUp(i, pokemon.learnedMoveNames[i]);
             });
 
             const ivArray = pokemon.getIndividuals();

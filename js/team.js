@@ -75,8 +75,8 @@ const initTeamSessionStorageSetter = baseDataLoader
                 pokemon.item = NONE;
             }
 
-            if (pokemon.moveNames === null) {
-                pokemon.moveNames = [pokeData.Learnset[0], NONE, NONE, NONE];
+            if (pokemon.learnedMoveNames === null) {
+                pokemon.learnedMoveNames = [pokeData.Learnset[0], NONE, NONE, NONE];
             }
 
             if (pokemon.pointUps === null) {

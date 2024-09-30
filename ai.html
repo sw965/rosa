@@ -8,11 +8,13 @@
     <script src="js/server-url.js"></script>
     <script src="js/base-data.js"></script>
     <script src="js/base-const.js"></script>
-    <script src="js/pp-func.js"></script>
+    <script src="js/pp.js"></script>
     <script src="js/pokemon.js"></script>
     <script src="js/team.js"></script>
     <script src="js/ai.js"></script>
     <script src="js/path.js"></script>
+    <script src="js/battle-type.js"></script>
+
     <style>
         table {
             border-collapse: collapse;
@@ -41,11 +43,11 @@
     <table>
         <tr>
             <td class="border-cell">
-                <span class="player-lead-poke-name-gender-level">ラティオス ♂ Lv:50</span>
+                <span class="player-lead-name-gender-level"></span>
                 <br>
-                <span class="player-lead-hp">現在のHP / 最大HP</span>
+                <span class="player-lead-hp"></span>
                 <br>
-                <img class="player-lead-pokemon-img flip-image">
+                <img class="player-lead-img flip-image">
             </td>
 
             <td class="top-border-cell">
@@ -57,23 +59,23 @@
             </td>
 
             <td  class="border-cell">
-                <span class="ai-lead-poke-name-gender-level">ラティオス ♂ Lv:50</span>
+                <span class="ai-lead-name-gender-level"></span>
                 <br>
-                <span class="ai-lead-hp">現在のHP / 最大HP</span>
+                <span class="ai-lead-hp"></span>
                 <br>
                 <img src="data/fourth-generation/img/hp_bar/100.png">
                 <br>
-                <img class="ai-lead-pokemon-img">
+                <img class="ai-lead-img">
             </td>
         </tr>
 
         <tr>
             <td class="border-cell">
-                <span class="player-lead-poke-name-gender-level">ラティオス ♂ Lv:50</span>
+                <span class="player-lead-name-gender-level"></span>
                 <br>
-                <span class="player-lead-hp">現在のHP / 最大HP</span>
+                <span class="player-lead-hp"></span>
                 <br>
-                <img class="player-lead-pokemon-img flip-image">
+                <img class="player-lead-img flip-image">
             </td>
 
             <td>
@@ -85,27 +87,27 @@
             </td>
 
             <td class="border-cell">
-                <span class="ai-lead-poke-name-gender-level">ラティオス ♂ Lv:50</span>
+                <span class="ai-lead-name-gender-level"></span>
                 <br>
-                <span class="ai-lead-hp">現在のHP / 最大HP</span>
+                <span class="ai-lead-hp"></span>
                 <br>
-                <img class="ai-lead-pokemon-img">
+                <img class="ai-lead-img">
             </td>
         </tr>
 
         <tr>
-            <td class="border-cell" colspan="4"><h3 id="battle-msg">バトルメッセージ</h3></td>
+            <td class="border-cell" colspan="4"><h3 id="battle-msg"></h3></td>
         </tr>
     </table>
 
     <table>
         <tr>
-            <td class="border-cell command-td" colspan="2"><button class="command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
-            <td class="border-cell command-td" colspan="2"><button class="command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
+            <td class="border-cell command-td" colspan="2"><button class="dynamic-command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
+            <td class="border-cell command-td" colspan="2"><button class="dynamic-command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
         </tr>
         <tr>
-            <td class="border-cell command-td" colspan="2"><button class="command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
-            <td class="border-cell command-td" colspan="2"><button class="command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
+            <td class="border-cell command-td" colspan="2"><button class="dynamic-command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
+            <td class="border-cell command-td" colspan="2"><button class="dynamic-command" style="width: 100%; height: 100%; visibility: hidden;"></button></td>
         </tr>
     </table>
 </body>

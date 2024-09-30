@@ -8,7 +8,7 @@ class Pokemon {
         this.ability = null;
         this.item = null;
 
-        this.moveNames = null;
+        this.learnedMoveNames = null;
         this.pointUps = null;
         this.moveset = null;
 
@@ -63,19 +63,19 @@ class Pokemon {
             this.thisTurnPlannedUseMoveName
         */
     }
-    
+
     updateMoveset() {
         const moveset = {};
-        this.moveNames.filter(moveName => {
+        this.learnedMoveNames.filter(moveName => {
             return moveName !== NONE;
         }).map((moveName, i) => {
             const pointUp = this.pointUps[i];
             const moveData = MOVEDEX[moveName];
             const pp = calcPowerPoint(moveData.BasePP, pointUp);
             moveset[moveName] = {max:pp, current:pp};
-        })
+        });
         this.moveset = moveset;
-    }
+    };
 
     getIndividuals() {
         return [
@@ -86,7 +86,7 @@ class Pokemon {
             this.individualStat.spDef,
             this.individualStat.speed,
         ];
-    }
+    };
 
     setMaxIndividualStat() {
         this.individualStat = {
@@ -97,7 +97,7 @@ class Pokemon {
             spDef:MAX_IV,
             speed:MAX_IV,
         };
-    }
+    };
 
     getEfforts() {
         return [
@@ -108,7 +108,7 @@ class Pokemon {
             this.effortStat.spDef,
             this.effortStat.speed,
         ];
-    }
+    };
 
     setMinEffortStat() {
         this.effortStat = {
@@ -119,7 +119,7 @@ class Pokemon {
             spDef:MIN_EV,
             speed:MIN_EV,
         };
-    }
+    };
 
     updateStat() {
         const pokeData = POKEDEX[this.name];
@@ -132,7 +132,7 @@ class Pokemon {
         this.stat.spAtk = new PokemonEachStatCalculator(pokeData.BaseSpAtk, this.level, this.individualStat.spAtk, this.effortStat.spAtk).hpOther(natureData.SpAtkBonus);
         this.stat.spDef = new PokemonEachStatCalculator(pokeData.BaseSpDef, this.level, this.individualStat.spDef, this.effortStat.spDef).hpOther(natureData.SpDefBonus);
         this.stat.speed = new PokemonEachStatCalculator(pokeData.BaseSpeed, this.level, this.individualStat.speed, this.effortStat.speed).hpOther(natureData.SpeedBonus);
-    }
+    };
 
     initBattleAttribute() {
         this.types = POKEDEX[this.name].Types;
@@ -149,8 +149,8 @@ class Pokemon {
         this.protectConsecutiveSuccess = 0;
         this.substituteHP = 0;
         this.turnCount = 0;
-    }
-}
+    };
+};
 
 function objectToPokemon(obj) {
     const pokemon = new Pokemon();
@@ -162,7 +162,7 @@ function objectToPokemon(obj) {
     pokemon.ability = obj.ability;
     pokemon.item = obj.item;
 
-    pokemon.moveNames = obj.moveNames;
+    pokemon.learnedMoveNames = obj.learnedMoveNames;
     pokemon.pointUps = obj.pointUps;
     pokemon.moveset = obj.moveset;
 
@@ -170,7 +170,7 @@ function objectToPokemon(obj) {
     pokemon.effortStat = obj.effortStat;
     pokemon.stat = obj.stat;
     return pokemon;
-}
+};
 
 class PokemonEachStatCalculator {
     constructor(base, level, individual, effort) {
@@ -178,16 +178,16 @@ class PokemonEachStatCalculator {
         this.level = level;
         this.individual = individual;
         this.effort = effort;
-    }
+    };
 
     hp() {
         const evBonus = Math.floor(this.effort/EFFECT_EFFORT);
         return Math.floor(((this.baseStat*2 + this.individual + evBonus) * this.level / 100)) + this.level + 10;
-    }
+    };
 
     hpOther(natureBonus) {
         const evBonus = Math.floor(this.effort/EFFECT_EFFORT);
         const stat = (this.baseStat*2 + this.individual + evBonus) * this.level/100 + 5;
         return parseInt(stat * natureBonus, 10);
-    }
-}
+    };
+};

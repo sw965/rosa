@@ -1,5 +1,3 @@
-const BATTLE_START_BUTTON_ID = "battle-start-button";
-
 document.addEventListener("DOMContentLoaded", () => {
     const PLAYER_TEAM_ANCHORS = document.getElementsByClassName("player-pokemon-editor-link");
     const AI_TEAM_ANCHORS = document.getElementsByClassName("ai-pokemon-editor-link");
@@ -42,9 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const battleTypeRadio = document.querySelector('input[name="battle-type"]:checked');
 
                 let battleNum = 0;
-                if (battleTypeRadio.value === "シングルバトル") {
+                if (battleTypeRadio.value === SINGLE_BATTLE) {
                     battleNum = 1;
-                } else if (battleTypeRadio.value === "ダブルバトル") {
+                } else if (battleTypeRadio.value === DOUBLE_BATTLE) {
                     battleNum = 2;
                 };
 
@@ -70,9 +68,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 function noneToEmpty(pokemons) {
                     pokemons.map(pokemon => {
-                        pokemon.moveNames.map((moveName, i) => {
+                        pokemon.learnedMoveNames.map((moveName, i) => {
                             if (moveName === NONE) {
-                                pokemon.moveNames[i] = ""
+                                pokemon.learnedMoveNames[i] = ""
                             }
                         });
     
@@ -87,22 +85,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 noneToEmpty(aiLeadPokemons);
                 noneToEmpty(aiBenchPokemons);
 
-                const url = new URL(BATTLE_INIT_SERVER_URL);
-                url.searchParams.append("ai_trainer_title", encodeURIComponent("四天王"));
-                url.searchParams.append("ai_trainer_name", encodeURIComponent("カトレア"));
-                url.searchParams.append("player_lead_pokemons", encodeURIComponent(JSON.stringify(playerLeadPokemons)));
-                url.searchParams.append("player_bench_pokemons", encodeURIComponent(JSON.stringify(playerBenchPokemons)));
-                url.searchParams.append("ai_lead_pokemons", encodeURIComponent(JSON.stringify(aiLeadPokemons)));
-                url.searchParams.append("ai_bench_pokemons", encodeURIComponent(JSON.stringify(aiBenchPokemons)));
+                const battleInitURL = new URL(BATTLE_INIT_SERVER_URL);
+                battleInitURL.searchParams.append("ai_trainer_title", encodeURIComponent("四天王"));
+                battleInitURL.searchParams.append("ai_trainer_name", encodeURIComponent("カトレア"));
+                battleInitURL.searchParams.append("player_lead_pokemons", encodeURIComponent(JSON.stringify(playerLeadPokemons)));
+                battleInitURL.searchParams.append("player_bench_pokemons", encodeURIComponent(JSON.stringify(playerBenchPokemons)));
+                battleInitURL.searchParams.append("ai_lead_pokemons", encodeURIComponent(JSON.stringify(aiLeadPokemons)));
+                battleInitURL.searchParams.append("ai_bench_pokemons", encodeURIComponent(JSON.stringify(aiBenchPokemons)));
 
-                fetch(url.toString())
-                    .then(response => {
-                        return response.json();
-                    })
-                    .then((json) => {
-                        sessionStorage.setItem("initBattles", JSON.stringify(json));
-                        location.href = "ai.html";
-                    });
+                const battleMCTSInitURL = new URL(BATTLE_MCTS_INIT_SERVER_URL);
+                battleMCTSInitURL.searchParams.append("c", 5.0);
+
+                const battleInitFetcher = fetch(battleInitURL.toString());
+                const battleMCTSInitFetcher = fetch(battleMCTSInitURL.toString());
+                alert(battleMCTSInitURL.toString());
+
+                Promise.all([battleInitFetcher, battleMCTSInitFetcher])
+                .then(async ([battleInitResponse, battleMCTSInitResponse]) => {
+                  const initBattles = await battleInitResponse.json();
+                  sessionStorage.setItem("init_battles", JSON.stringify(initBattles));
+                  sessionStorage.setItem("battle_type", battleTypeRadio.value);
+                  location.href = "ai.html";
+                })
+                .catch(error => {
+                  console.error("エラーが発生", error);
+                });
             });
         });
 
