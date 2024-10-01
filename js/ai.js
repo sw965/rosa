@@ -363,7 +363,16 @@ document.addEventListener("DOMContentLoaded", () => {
             };
 
             if (target.innerHTML === POKEMON_MENU_TEXT) {
-                window.open("pokemon-menu.html", "_blank", "width=800,height=600");
+                const pokemonMenu = window.open("pokemon-menu.html", "_blank", "width=800,height=600");
+                DYNAMIC_COMMAND_BUTTONS[0].disabled = true;
+                DYNAMIC_COMMAND_BUTTONS[2].disabled = true;
+                const checkPopupClosed = setInterval(function() {
+                    if (pokemonMenu.closed) {
+                        clearInterval(checkPopupClosed);
+                        DYNAMIC_COMMAND_BUTTONS[0].disabled = false;
+                        DYNAMIC_COMMAND_BUTTONS[2].disabled = false;
+                    }
+                }, 500);
                 return;
             };
 

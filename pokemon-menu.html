@@ -14,13 +14,7 @@
 
         #pokemon-menu-table {
             width: 100%;
-            height: 70%;
-            border-collapse: collapse;
-        }
-
-        #operation-button-table {
-            width: 100%;
-            height: 30%;
+            height: 100%;
             border-collapse: collapse;
         }
 
@@ -35,7 +29,7 @@
     <table id="pokemon-menu-table">
         <tr>
             <td>
-                <button style="width: 100%; height: 100%">
+                <button class="pokemon-button" style="width: 100%; height: 100%">
                     <span class="name-gender-level">ラティオス ♂ Lv.50</span>
                     <br>
                     <span class="hp">100/100</span>
@@ -46,32 +40,7 @@
                 </button>
             </td>
             <td>
-                <button style="width: 100%; height: 100%">
-                    <span class="name-gender-level">ラティオス ♂ Lv.50</span>
-                    <br>
-                    <span class="hp">100/100</span>
-                    <br>
-                    <img src="data/fourth-generation/img/hp_bar/100.png">
-                    <br>
-                    <img class="pokemon-img">
-                </button>
-            </td>
-        </tr>
-    
-        <tr>
-            <td>
-                <button style="width: 100%; height: 100%">
-                    <span class="name-gender-level">ラティオス ♂ Lv.50</span>
-                    <br>
-                    <span class="hp">100/100</span>
-                    <br>
-                    <img src="data/fourth-generation/img/hp_bar/100.png">
-                    <br>
-                    <img class="pokemon-img">
-                </button>
-            </td>
-            <td>
-                <button style="width: 100%; height: 100%">
+                <button class="pokemon-button" style="width: 100%; height: 100%">
                     <span class="name-gender-level">ラティオス ♂ Lv.50</span>
                     <br>
                     <span class="hp">100/100</span>
@@ -85,7 +54,32 @@
     
         <tr>
             <td>
-                <button style="width: 100%; height: 100%;">
+                <button class="pokemon-button" style="width: 100%; height: 100%">
+                    <span class="name-gender-level">ラティオス ♂ Lv.50</span>
+                    <br>
+                    <span class="hp">100/100</span>
+                    <br>
+                    <img src="data/fourth-generation/img/hp_bar/100.png">
+                    <br>
+                    <img class="pokemon-img">
+                </button>
+            </td>
+            <td>
+                <button class="pokemon-button" style="width: 100%; height: 100%">
+                    <span class="name-gender-level">ラティオス ♂ Lv.50</span>
+                    <br>
+                    <span class="hp">100/100</span>
+                    <br>
+                    <img src="data/fourth-generation/img/hp_bar/100.png">
+                    <br>
+                    <img class="pokemon-img">
+                </button>
+            </td>
+        </tr>
+    
+        <tr>
+            <td>
+                <button class="pokemon-button" style="width: 100%; height: 100%;">
                     <span class="name-gender-level">ラティオス ♂ Lv.50</span>
                     <br>
                     <span class="hp">100/100</span>
@@ -96,7 +90,7 @@
                 </button>
             </td>
             <td>
-                <button style="width: 100%; height: 100%">
+                <button class="pokemon-button" style="width: 100%; height: 100%">
                     <span class="name-gender-level">ラティオス ♂ Lv.50</span>
                     <br>
                     <span class="hp">100/100</span>
@@ -107,13 +101,10 @@
                 </button>
             </td>
         </tr>
-    </table>
-
-    <table id="operation-button-table">
         <tr>
-            <td>交代</td>
-            <td>つよさをみる</td>
-            <td>閉じる</td>
+            <td colspan="2">
+                <button id="exit-button" style="width: 100%; height: 100%">閉じる</button>
+            </td>
         </tr>
     </table>
 </body>
